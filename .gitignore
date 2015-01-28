@@ -1,0 +1,6 @@
+*.osm.pbf
+*.osrm
+*.osrm.*
+osrm-*
+*.log
+*.errlog
