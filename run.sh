@@ -2,10 +2,10 @@
 
 set -e
 
-./refreshsourcedata.sh monaco-latest
-./refreshsourcedata.sh liechtenstein-latest
+./refreshsourcedata.sh great-britain-latest
+./refreshsourcedata.sh france-latest
 
-osmosis --read-pbf file=monaco-latest.osm.pbf --read-pbf file=liechtenstein-latest.osm.pbf \
+osmosis --read-pbf file=great-britain-latest.osm.pbf --read-pbf file=france-latest.osm.pbf \
 					--merge --write-pbf file=countries.osm.pbf
 
 ./dobuild.sh

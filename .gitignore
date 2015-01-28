@@ -4,3 +4,6 @@
 osrm-*
 *.log
 *.errlog
+*.pem
+*.out
+
