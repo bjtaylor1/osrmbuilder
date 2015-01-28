@@ -18,3 +18,7 @@ speed_profile = {
   ["default"] = 17
 }
 
+function get_specific_speed(way)
+return 0
+end
+

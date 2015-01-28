@@ -74,6 +74,11 @@ function get_speed (way)
   local junction = way:get_value_by_key("junction")
   local thespeed = -1
 
+	local specificspeed=auk.get_specific_speed(way)
+	if(0 ~= specificspeed) then
+		return specificspeed
+	end
+
 --special ways override everything else and we can go max (unclassified) speed on them
   if(Whitelist.whitelist_ways_by_id[way.id]) then
     return speed_unclassified

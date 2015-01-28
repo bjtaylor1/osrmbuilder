@@ -9,7 +9,6 @@ for routetype in auk tourist; do
   cp -r luaspecifics $routetype
   cp $routetype.lua $routetype
   cp ../Project-OSRM/build/osrm-* $routetype
-	cp .stxxl $routetype
 
   cd $routetype
   ln -s ../countries.osm.pbf countries.osm.pbf

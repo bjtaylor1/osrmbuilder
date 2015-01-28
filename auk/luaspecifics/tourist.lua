@@ -18,3 +18,26 @@ speed_profile = {
   ["default"] = 15
 }
 
+function get_specific_speed(way)
+
+  local surface = way:get_value_by_key("surface")
+  local bicycle = way:get_value_by_key("bicycle")
+  local bikesallowed = ("yes" == bicycle or "permissive" == bicycle or "designated" == bicycle or "destination" == bicycle)
+  local name = way:get_value_by_key("name")
+  local highway = way:get_value_by_key("highway")
+  local descriptor = highway.." "..surface.." "..bicycle.." "..name
+  if ("asphalt" == surface or "paved" == surface) and 
+	("cycleway" == highway or
+		("track" == highway and bikesallowed) or
+		("bridleway" == highway and bikesallowed) or 
+		("footway" == highway and bikesallowed) or
+        ("path" == highway and bikesallowed)
+		) then
+	
+			return 43
+	else
+		return 0
+  end
+
+end
+
