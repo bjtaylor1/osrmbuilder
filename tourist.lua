@@ -99,7 +99,7 @@ function get_speed (way)
 
 	local max_speed = parse_maxspeed( way:get_value_by_key("maxspeed") )
 
-  if maxspeed ~= nil and maxspeed >= 112 and "roundabout" ~= junction then --112 = 70 mph
+  if max_speed ~= nil and max_speed >= 112 and "roundabout" ~= junction then --112 = 70 mph
 		print "motorway!"
     return -1
   end
