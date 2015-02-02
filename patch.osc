@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osmChange version="0.6" generator="OpenStreetMap server" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">
+  <create>
+    <node id="3326852407" changeset="28565585" timestamp="2015-02-02T13:08:37Z" version="1" visible="true" user="bentaylor" uid="538375" lat="53.7195679" lon="-0.4532129"/>
+  </create>
+  <modify>
+    <way id="13008707" changeset="28565673" timestamp="2015-02-02T13:12:18Z" version="3" visible="true" user="bentaylor" uid="538375">
+      <nd ref="119661261"/>
+      <nd ref="119661263"/>
+      <nd ref="119661267"/>
+      <tag k="foot" v="yes"/>
+      <tag k="highway" v="cycleway"/>
+      <tag k="surface" v="asphalt"/>
+    </way>
+  </modify>
+  <create>
+    <way id="326065801" changeset="28565585" timestamp="2015-02-02T13:08:37Z" version="1" visible="true" user="bentaylor" uid="538375">
+      <nd ref="119661021"/>
+      <nd ref="119660992"/>
+      <tag k="highway" v="cycleway"/>
+      <tag k="surface" v="asphalt"/>
+    </way>
+  </create>
+</osmChange>
