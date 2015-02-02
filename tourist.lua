@@ -7,6 +7,8 @@ access_tags_hierachy = { "motorcar", "motor_vehicle", "vehicle", "access" }
 barrier_whitelist = { ["cattle_grid"] = true, ["border_control"] = true, ["checkpoint"] = true, ["toll_booth"] = true, ["sally_port"] = true, ["gate"] = true, ["no"] = true, ["entrance"] = true }
 access_tag_blacklist = { ["no"] = true, ["private"] = true, ["agricultural"] = true, ["forestry"] = true, ["emergency"] = true }
 
+traffic_signal_penalty=3
+
 maxspeed_table_default = {
   ["urban"] = 50,
   ["rural"] = 90,
@@ -100,7 +102,7 @@ function get_speed (way)
 	local max_speed = parse_maxspeed( way:get_value_by_key("maxspeed") )
 
   if max_speed ~= nil and max_speed >= 112 and "roundabout" ~= junction then --112 = 70 mph
-		print "motorway!"
+		--it's a de-facto motorway, we don't want to cycle on that
     return -1
   end
 
