@@ -3,12 +3,10 @@ set -e
 
 for routetype in auk tourist; do
   echo Preparing $routetype
-  rm -rf $routetype
-  mkdir $routetype
-  cp -r lualib $routetype
-  cp -r luaspecifics $routetype
-  cp $routetype.lua $routetype
-  cp ../Project-OSRM/build/osrm-* $routetype
+	rm -rf $routetype
+	mkdir $routetype
+
+	./preparedirectory.sh $routetype
 
   cd $routetype
   ln -s ../countries.osm.pbf countries.osm.pbf

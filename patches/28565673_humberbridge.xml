@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osmChange version="0.6" generator="OpenStreetMap server" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">
+  <modify>
+    <way id="13008707" changeset="28565673" timestamp="2015-02-02T13:12:18Z" version="3" visible="true" user="bentaylor" uid="538375">
+      <nd ref="119661261"/>
+      <nd ref="119661263"/>
+      <nd ref="119661267"/>
+      <tag k="foot" v="yes"/>
+      <tag k="highway" v="cycleway"/>
+      <tag k="surface" v="asphalt"/>
+    </way>
+  </modify>
+</osmChange>

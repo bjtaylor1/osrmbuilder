@@ -1,4 +1,5 @@
 *.osm.pbf
+*.osm
 *.osrm
 *.osrm.*
 osrm-*
@@ -6,4 +7,4 @@ osrm-*
 *.errlog
 *.pem
 *.out
-
+debug/
