@@ -51,9 +51,8 @@ whitelist_ways_by_id = {
 [243098435] = true,
 [243097281] = true,
 [243098977] = true,
-[127075991] = true,
 [254317409] = true, -- mine(cut through to burton waters)] = true,
-[127075991] = true, -- burton waters-saxilby (joined to a57)] = true,
+--[127075991] = true, -- burton waters-saxilby (joined to a57)] = true,
 [43908609] = true,
 --severn bridge
 [253508029] = true,
