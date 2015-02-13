@@ -1,0 +1,21 @@
+sudo apt-get update
+sudo apt-get install build-essential git cmake pkg-config libprotoc-dev libprotobuf8 \
+protobuf-compiler libprotobuf-dev libosmpbf-dev libpng12-dev \
+libbz2-dev libstxxl-dev libstxxl-doc libstxxl1 libxml2-dev \
+libzip-dev libboost-all-dev lua5.1 liblua5.1-0-dev libluabind-dev libluajit-5.1-dev libtbb-dev
+
+setup .stxxl: $STXXLCFG points to file with
+disk=/home/ben/stxxldata,20000,syscall
+for each disk available (number is in MB)
+(stxxldata is a file that must be able to be written to)
+
+
+sudo apt-get install postgresql postgresql-contrib postgis postgresql-9.3-postgis-2.1 imposm
+
+git clone http://github.com/bjtaylor1/osrmbuilder
+cd osrmbuilder
+./build.sh
+
+
+
+
