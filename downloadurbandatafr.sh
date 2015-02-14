@@ -1,0 +1,31 @@
+#!/bin/bash
+
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr009c_lille.zip" >fr009c_lille.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr010l_montpellier.zip" >fr010l_montpellier.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr012l_le_havre.zip" >fr012l_le_havre.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr017l_metz.zip" >fr017l_metz.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr032l_toulon.zip" >fr032l_toulon.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr203c_marseille.zip" >fr203c_marseille.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr205c_nice.zip" >fr205c_nice.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr207c_lens_lievin.zip" >fr207c_lens_lievin.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr016l_nancy.zip" >fr016l_nancy.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr022l_clermont-ferrand.zip" >fr022l_clermont-ferrand.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr006l_strasbourg.zip" >fr006l_strasbourg.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr008l_nantes.zip" >fr008l_nantes.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr011c_saint_etienne.zip" >fr011c_saint_etienne.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr014l_amiens.zip" >fr014l_amiens.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr018l_reims.zip" >fr018l_reims.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr019l_orleans.zip" >fr019l_orleans.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr026l_grenoble.zip" >fr026l_grenoble.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr035l_tours.zip" >fr035l_tours.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr202c_aix_en_provence.zip" >fr202c_aix_en_provence.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr013l_rennes.zip" >fr013l_rennes.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr004l_toulouse.zip" >fr004l_toulouse.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr020l_dijon.zip" >fr020l_dijon.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr021l_poitiers.zip" >fr021l_poitiers.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr007l_bordeaux.zip" >fr007l_bordeaux.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr025l_besancon.zip" >fr025l_besancon.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr023l_caen.zip" >fr023l_caen.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr027l_ajaccio.zip" >fr027l_ajaccio.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr024l_limoges.zip" >fr024l_limoges.zip
+curl "http://www.eea.europa.eu/data-and-maps/data/urban-atlas/france/fr015l_rouen.zip" >fr015l_rouen.zip

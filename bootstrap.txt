@@ -1,8 +1,24 @@
-sudo apt-get update
-sudo apt-get install build-essential git cmake pkg-config libprotoc-dev libprotobuf8 \
+sudo apt-get update && sudo apt-get upgrade
+
+mount disks and put them in /etc/fstab as per
+http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/InstanceStorage.html
+mkfs.ext4 -E nodiscard /dev/xvdb &&  mkfs.ext4 -E nodiscard /dev/xvdc
+mkdir /mnt/xvdb && mkdir /mnt/xvdc
+/dev/xvdb   /mnt/xvdb   ext4    defaults,nofail,discard   0   2
+/dev/xvdc   /mnt/xvdc   ext4   defaults,nofail,discard   0   2
+
+sudo apt-get install unzip build-essential git cmake pkg-config libprotoc-dev libprotobuf8 \
 protobuf-compiler libprotobuf-dev libosmpbf-dev libpng12-dev \
 libbz2-dev libstxxl-dev libstxxl-doc libstxxl1 libxml2-dev \
 libzip-dev libboost-all-dev lua5.1 liblua5.1-0-dev libluabind-dev libluajit-5.1-dev libtbb-dev
+
+permissions:
+chown root:ubuntu /mnt/xvdb /mnt/xvdc
+chmod 775 /mnt/xvdb /mnt/xvdc
+
+disk=/mnt/xvdb/stxxldata,712750,syscall
+disk=/mnt/xvdc/stxxldata,712750,syscall
+
 
 setup .stxxl: $STXXLCFG points to file with
 disk=/home/ben/stxxldata,20000,syscall
@@ -10,7 +26,14 @@ for each disk available (number is in MB)
 (stxxldata is a file that must be able to be written to)
 
 
+
 sudo apt-get install postgresql postgresql-contrib postgis postgresql-9.3-postgis-2.1 imposm
+sudo -u postgres psql -c  "create user ubuntu --superuser"
+sudo -u postgres createdb osm
+echo "\set ON_ERROR_STOP on">>~/.psqlrc
+
+sudo -u postgres psql -d osm -c "CREATE EXTENSION postgis;"
+sudo -u postgres psql -d osm -c "CREATE EXTENSION postgis_topology;"
 
 git clone http://github.com/bjtaylor1/osrmbuilder
 cd osrmbuilder
