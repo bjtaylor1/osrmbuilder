@@ -8,3 +8,8 @@ osrm-*
 *.pem
 *.out
 debug/
+auk/
+touristb/
+
+*.cache
+urbannessdata_scotland
