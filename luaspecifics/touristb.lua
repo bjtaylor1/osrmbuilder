@@ -1,17 +1,17 @@
 module "touristb"
 
-whitelist_speed = 20
+whitelist_speed = 19 
 
 speed_profile = {
   ["trunk"] = 5,
   ["trunk_link"] = 5,
   ["primary"] = 15,
   ["primary_link"] = 15,
-  ["secondary"] = 20,
-  ["secondary_link"] = 20,
-  ["tertiary"] = 20,
-  ["tertiary_link"] = 20,
-  ["unclassified"] = 20,
+  ["secondary"] = 17,
+  ["secondary_link"] = 17,
+  ["tertiary"] = 17,
+  ["tertiary_link"] = 17,
+  ["unclassified"] = 19,
   ["residential"] = 15,
   ["living_street"] = 15,
   ["service"] = 5,
