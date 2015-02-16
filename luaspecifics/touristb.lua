@@ -1,6 +1,6 @@
 module "touristb"
 
-whitelist_speed = 20
+whitelist_speed = 19 
 
 speed_profile = {
   ["trunk"] = 5,
