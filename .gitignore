@@ -12,4 +12,5 @@ auk/
 touristb/
 
 *.cache
-urbannessdata_scotland
+urbannessdata_scotland/
+urbannessdata/
