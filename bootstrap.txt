@@ -1,20 +1,33 @@
-sudo apt-get update && sudo apt-get upgrade
 
-mount disks and put them in /etc/fstab as per
+#check disk exists:
+sudo cat /sys/block/xvdb/queue/discard_max_bytes
+
+#list disks:
+lsblk
+
+#mount ebs:
+http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html
+mkfs -t ext4 /dev/xvdd
+mkdir /results
+mount /dev/xvdd /results
+
 http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/InstanceStorage.html
 mkfs.ext4 -E nodiscard /dev/xvdb &&  mkfs.ext4 -E nodiscard /dev/xvdc
-mkdir /mnt/xvdb && mkdir /mnt/xvdc
-/dev/xvdb   /mnt/xvdb   ext4    defaults,nofail,discard   0   2
-/dev/xvdc   /mnt/xvdc   ext4   defaults,nofail,discard   0   2
+mkdir /disk1 && mkdir /disk2
+mount -o discard /dev/xvdb /disk1
+mount -o discard /dev/xvdc /disk2
+/dev/xvdb   /disk1   ext4    defaults,nofail,discard   0   2
+/dev/xvdc   /disk2   ext4   defaults,nofail,discard   0   2
+
+permissions:
+chown root:ubuntu /disk1 /disk2 /results
+chmod 775 /disk1 /disk2 /results
 
 sudo apt-get install unzip build-essential git cmake pkg-config libprotoc-dev libprotobuf8 \
 protobuf-compiler libprotobuf-dev libosmpbf-dev libpng12-dev \
 libbz2-dev libstxxl-dev libstxxl-doc libstxxl1 libxml2-dev \
 libzip-dev libboost-all-dev lua5.1 liblua5.1-0-dev libluabind-dev libluajit-5.1-dev libtbb-dev
 
-permissions:
-chown root:ubuntu /mnt/xvdb /mnt/xvdc
-chmod 775 /mnt/xvdb /mnt/xvdc
 
 disk=/mnt/xvdb/stxxldata,712750,syscall
 disk=/mnt/xvdc/stxxldata,712750,syscall
@@ -27,7 +40,7 @@ for each disk available (number is in MB)
 
 
 
-sudo apt-get install postgresql postgresql-contrib postgis postgresql-9.3-postgis-2.1 imposm
+sudo apt-get install postgresql postgresql-contrib postgis postgresql-9.3-postgis-2.1 imposm osmosis
 sudo -u postgres psql -c  "create user ubuntu --superuser"
 sudo -u postgres createdb osm
 echo "\set ON_ERROR_STOP on">>~/.psqlrc
