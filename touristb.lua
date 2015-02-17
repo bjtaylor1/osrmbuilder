@@ -12,7 +12,7 @@ traffic_signal_penalty=6
 -- Open PostGIS connection
 lua_sql = require "luasql.postgres"           -- we will connect to a postgresql database
 sql_env = assert( lua_sql.postgres() )
-sql_con = assert( sql_env:connect("osm") ) -- you can add db user/password here if needed
+sql_con = assert( sql_env:connect("osm", "osm", "osm") ) -- you can add db user/password here if needed
 print("PostGIS connection opened")
 
 
