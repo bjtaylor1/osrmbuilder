@@ -21,8 +21,3 @@ insert into urbanness_defs(ru_def_des, description, score) values
 , ('R_V_S', 'Rural: Village, Sparse', 1.0)
 ;
 
-create index urbanness_defs_pk on urbanness_defs(ru_def_des);
-
-cluster urbanness_defs using urbanness_defs_pk;
-
-vacuum;

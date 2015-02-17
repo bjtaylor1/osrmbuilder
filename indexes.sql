@@ -3,13 +3,11 @@
 drop index if exists osm_mainroads_ref;
 drop index if exists osm_minorroads_ref;
 drop index if exists osm_motorways_ref;
-drop index if exists busyness_ref;
 drop index if exists osm_mainroads_osm_id;
 drop index if exists osm_minorroads_osm_id;
 drop index if exists osm_motorways_osm_id;
-drop index if exists busyness_geometry;
-drop index if exists busyness_category;
-
+drop index if exists urbanness_geometry;
+drop index if exists urbanness_defs_ru_def_des;
 
 create index osm_mainroads_ref on osm_mainroads(ref);
 create index osm_minorroads_ref on osm_minorroads(ref);
@@ -19,12 +17,15 @@ create index osm_mainroads_osm_id on osm_mainroads(osm_id);
 create index osm_minorroads_osm_id on osm_minorroads(osm_id);
 create index osm_motorways_osm_id on osm_motorways(osm_id);
 
-create index busyness_geometry on busyness using gist(geometry);
+create index urbanness_ru_def_des on urbanness(ru_def_des);
+create index urbanness_defs_ru_def_des on urbanness_defs(ru_def_des);
 
-create index busyness_ref on busyness(ref);
-create index busyness_category on busyness(category);
+create index urbanness_geometry on urbanness using gist(geom2);
+cluster urbanness using urbanness_geometry;
+cluster urbanness_defs using urbanness_defs_ru_def_des;
 
-cluster busyness using busyness_geometry;
+vacuum analyze;
+
 
 vacuum;
 
