@@ -29,8 +29,8 @@ libbz2-dev libstxxl-dev libstxxl-doc libstxxl1 libxml2-dev \
 libzip-dev libboost-all-dev lua5.1 liblua5.1-0-dev libluabind-dev libluajit-5.1-dev libtbb-dev
 
 
-disk=/mnt/xvdb/stxxldata,712750,syscall
-disk=/mnt/xvdc/stxxldata,712750,syscall
+disk=/disk1/stxxldata,712750,syscall
+disk=/disk2/stxxldata,712750,syscall
 
 
 setup .stxxl: $STXXLCFG points to file with
@@ -39,8 +39,17 @@ for each disk available (number is in MB)
 (stxxldata is a file that must be able to be written to)
 
 
+#install imposm as per http://imposm.org/docs/imposm/latest/install.html
+# MUST be version 2.6 with shapely speedups, not 2.5!
+# edit pg_hba.conf to use md5 authentication and create user osm with password osm (imposm's default)
+e.g.
+sudo -u postgres psql -c "create user osm with superuser password 'osm'"
 
-sudo apt-get install postgresql postgresql-contrib postgis postgresql-9.3-postgis-2.1 imposm osmosis
+sudo apt-get install postgresql postgresql-contrib postgis postgresql-9.3-postgis-2.1 osmosis
+sudo service postgresql stop && sudo mv /var/lib/postgresql/9.3/main /disk1/postgresql
+# !! Change postgresql data location in /etc/postgresql/9.3/main/postgresql.conf
+sudo service postgresql start
+
 sudo -u postgres psql -c  "create user ubuntu --superuser"
 sudo -u postgres createdb osm
 echo "\set ON_ERROR_STOP on">>~/.psqlrc
@@ -55,7 +64,7 @@ cd osrmbuilder
 #https://www.gov.uk/government/statistical-data-sets/local-enterprise-partnerships-leps-rural-urban-gis-shapefiles
 mkdir -p urbannessdata && cd urbannessdata
 ../downloadurbandata.sh
-for z in *.zip; do unzip $z; done
+for z in *.zip; do unzip -o $z; done
 ../importurbannessdata.sh
 cd ..
 
@@ -67,6 +76,11 @@ shp2pgsql -s 27700 SGUR_2011_2012_HWM.shp scotland | psql osm
 psql osm -c "insert into urbanness(ru_def_des, geom2) select 'U_CT', ST_Transform(geom, 900913) from scotland where ur6fold = 1"
 
 
+#urban classifications:
 
+psql osm -U osm -f urbanclassifications.sql
+
+#indexes:
+psql osm -U osm -f indexes.sql
 
 

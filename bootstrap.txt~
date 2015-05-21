@@ -1,8 +1,37 @@
-sudo apt-get update
-sudo apt-get install build-essential git cmake pkg-config libprotoc-dev libprotobuf8 \
+
+#check disk exists:
+sudo cat /sys/block/xvdb/queue/discard_max_bytes
+
+#list disks:
+lsblk
+
+#mount ebs:
+http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html
+mkfs -t ext4 /dev/xvdd
+mkdir /results
+mount /dev/xvdd /results
+
+http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/InstanceStorage.html
+mkfs.ext4 -E nodiscard /dev/xvdb &&  mkfs.ext4 -E nodiscard /dev/xvdc
+mkdir /disk1 && mkdir /disk2
+mount -o discard /dev/xvdb /disk1
+mount -o discard /dev/xvdc /disk2
+/dev/xvdb   /disk1   ext4    defaults,nofail,discard   0   2
+/dev/xvdc   /disk2   ext4   defaults,nofail,discard   0   2
+
+permissions:
+chown root:ubuntu /disk1 /disk2 /results
+chmod 775 /disk1 /disk2 /results
+
+sudo apt-get install unzip build-essential git cmake pkg-config libprotoc-dev libprotobuf8 \
 protobuf-compiler libprotobuf-dev libosmpbf-dev libpng12-dev \
 libbz2-dev libstxxl-dev libstxxl-doc libstxxl1 libxml2-dev \
 libzip-dev libboost-all-dev lua5.1 liblua5.1-0-dev libluabind-dev libluajit-5.1-dev libtbb-dev
+
+
+disk=/disk1/stxxldata,712750,syscall
+disk=/disk2/stxxldata,712750,syscall
+
 
 setup .stxxl: $STXXLCFG points to file with
 disk=/home/ben/stxxldata,20000,syscall
@@ -10,11 +39,40 @@ for each disk available (number is in MB)
 (stxxldata is a file that must be able to be written to)
 
 
-sudo apt-get install postgresql postgresql-contrib postgis postgresql-9.3-postgis-2.1 imposm
+#install imposm as per http://imposm.org/docs/imposm/latest/install.html
+# MUST be version 2.6 with shapely speedups, not 2.5!
+
+
+sudo apt-get install postgresql postgresql-contrib postgis postgresql-9.3-postgis-2.1 osmosis
+sudo service postgresql stop && sudo mv /var/lib/postgresql/9.3/main /disk1/postgresql
+# !! Change postgresql data location in /etc/postgresql/9.3/main/postgresql.conf
+sudo service postgresql start
+
+sudo -u postgres psql -c  "create user ubuntu --superuser"
+sudo -u postgres createdb osm
+echo "\set ON_ERROR_STOP on">>~/.psqlrc
+
+sudo -u postgres psql -d osm -c "CREATE EXTENSION postgis;"
+sudo -u postgres psql -d osm -c "CREATE EXTENSION postgis_topology;"
 
 git clone http://github.com/bjtaylor1/osrmbuilder
 cd osrmbuilder
-./build.sh
+
+#download urbanness data from the government
+#https://www.gov.uk/government/statistical-data-sets/local-enterprise-partnerships-leps-rural-urban-gis-shapefiles
+mkdir -p urbannessdata && cd urbannessdata
+../downloadurbandata.sh
+for z in *.zip; do unzip -o $z; done
+../importurbannessdata.sh
+cd ..
+
+#download scottish urbanness data:
+mkdir -p urbannessdata_scotland && cd urbannessdata_scotland
+curl http://www.scotland.gov.uk/Resource/0039/00399160.zip>scotland.zip
+unzip scotland.zip
+shp2pgsql -s 27700 SGUR_2011_2012_HWM.shp scotland | psql osm
+psql osm -c "insert into urbanness(ru_def_des, geom2) select 'U_CT', ST_Transform(geom, 900913) from scotland where ur6fold = 1"
+
 
 
 
