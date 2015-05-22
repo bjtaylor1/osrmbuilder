@@ -92,9 +92,6 @@ function way_function(way, result)
 				thespeed = thenewspeed
 			end
 	
-			if wayid == 4440504 or wayid == 200517501 or wayid == 16316910 then
-				print ("way "..wayid..", speed = "..thespeed)
-			end
 		end
 		cursor:close()
 	end
