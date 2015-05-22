@@ -22,6 +22,13 @@ speed_profile = {
 
 function get_specific_speed(way)
 
+	local ncnref = way:get_value_by_key("ncn_ref")
+	if (ncnref ~= nil and ncnref == "647") then
+		local wayid = way:id()
+		print "ncn 647 - "..wayid
+		return whitelist_speed
+	end
+
   local surface = way:get_value_by_key("surface")
   local bicycle = way:get_value_by_key("bicycle")
   local bikesallowed = ("yes" == bicycle or "permissive" == bicycle or "designated" == bicycle or "destination" == bicycle)
