@@ -28,6 +28,9 @@ protobuf-compiler libprotobuf-dev libosmpbf-dev libpng12-dev \
 libbz2-dev libstxxl-dev libstxxl-doc libstxxl1 libxml2-dev \
 libzip-dev libboost-all-dev lua5.1 liblua5.1-0-dev libluabind-dev libluajit-5.1-dev libtbb-dev
 
+#install lua-postgresql using luarocks
+#sometimes still can't find it but does after doing: luarocks search luasql (should list postgres)
+
 
 disk=/disk1/stxxldata,712750,syscall
 disk=/disk2/stxxldata,712750,syscall
