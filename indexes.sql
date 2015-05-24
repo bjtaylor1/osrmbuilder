@@ -7,6 +7,7 @@ drop index if exists osm_mainroads_osm_id;
 drop index if exists osm_minorroads_osm_id;
 drop index if exists osm_motorways_osm_id;
 drop index if exists urbanness_geometry;
+drop index if exists urbanness_ru_def_des;
 drop index if exists urbanness_defs_ru_def_des;
 
 create index osm_mainroads_ref on osm_mainroads(ref);
