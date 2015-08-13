@@ -13,6 +13,7 @@ traffic_signal_penalty=6
 lua_sql = require "luasql.postgres"           -- we will connect to a postgresql database
 sql_env = assert( lua_sql.postgres() )
 sql_con = assert( sql_env:connect("osm", "osm", "osm") ) -- you can add db user/password here if needed
+sql_con_devon = assert( sql_env:connect("osm_devon", "osm", "osm") ) -- you can add db user/password here if needed
 print("PostGIS connection opened")
 
 
@@ -72,6 +73,7 @@ function way_function(way, result)
     end
   end
 	local thespeed = get_speed(way)
+	local staticpenalty = 0
 
 	if thespeed ~= nil and thespeed > 0 then
 		local wayid = way:id()
@@ -94,11 +96,38 @@ function way_function(way, result)
 	
 		end
 		cursor:close()
-	end
 
---	print ("thespeed="..thespeed)
-	result.forward_speed = thespeed
+		local sql_query_steepness = "select maxpercentage as maxpercentage from steepness where osm_id="..wayid
+		local cursor_steepness = assert(sql_con_devon:execute(sql_query_steepness))
+		local row_steepness = cursor_steepness:fetch({}, "a")
+	--	print (sql_query_steepness)
+		if row_steepness then
+			local maxpercentage = tonumber(row_steepness.maxpercentage)
+			if maxpercentage >= 0.15 and maxpercentage < 0.16 then
+				thespeed = thespeed * 0.8
+			end
+			if maxpercentage >= 0.16 and maxpercentage < 0.17 then
+				thespeed = thespeed * 0.4
+			end
+			if maxpercentage >= 0.17 and maxpercentage < 0.18 then
+				thespeed = thespeed * 0.2
+			end
+			if maxpercentage >= 0.18 and maxpercentage < 0.19 then
+				thespeed = thespeed * 0.2
+			end
+			if maxpercentage >= 0.19 and maxpercentage < 0.20 then
+				thespeed = thespeed * 0.1
+			end
+			if maxpercentage >= 0.20 then
+				thespeed = thespeed * 0.05
+			end
+ 
+		end
+		cursor_steepness:close()
+	end
+result.forward_speed = thespeed
 	result.backward_speed = thespeed
+	result.duration = staticpenalty
 
 end
 
