@@ -186,3 +186,33 @@ function parse_maxspeed(source)
   end
   return n
 end
+
+
+
+turn_penalty = 60
+turn_bias      = 1.4
+
+function turn_function (angle)
+--		if angle > 75 or angle < -75 then
+--			return 350
+--		elseif angle > 45 or angle < -45 then
+--			return 200
+--		else
+			return 0 
+--		end
+end
+
+function turn_function_alt(angle)
+    -- compute turn penalty as angle^2, with a left/right bias
+    k = turn_penalty/(90.0*90.0)
+		local result=0
+    if angle>=0 then
+        result = angle*angle*k/turn_bias
+    else
+        result = angle*angle*k*turn_bias
+    end
+--	print ("turn_function, angle="..angle..", result="..result)
+	return result * 10
+end
+
+

@@ -26,11 +26,13 @@ chmod 775 /disk1 /disk2 /results
 sudo apt-get install unzip build-essential git cmake pkg-config libprotoc-dev libprotobuf8 \
 protobuf-compiler libprotobuf-dev libosmpbf-dev libpng12-dev \
 libbz2-dev libstxxl-dev libstxxl-doc libstxxl1 libxml2-dev \
-libzip-dev libboost-all-dev lua5.1 liblua5.1-0-dev libluabind-dev libluajit-5.1-dev libtbb-dev lua-sql-postgres lua-sql-postgres-dev
+libzip-dev libboost-all-dev lua5.1 liblua5.1-0-dev libluabind-dev libluajit-5.1-dev libtbb-dev \
+postgresql postgresql-contrib postgis postgresql-9.3-postgis-2.1 osmosis lua-sql-postgres lua-sql-postgres-dev osmctools
 
 disk=/disk1/stxxldata,712750,syscall
 disk=/disk2/stxxldata,712750,syscall
 
+# edit pg_hba.conf to use md5 authentication and create user osm with password osm (imposm's default)
 
 setup .stxxl: $STXXLCFG points to file with
 disk=/home/ben/stxxldata,20000,syscall
@@ -39,15 +41,17 @@ for each disk available (number is in MB)
 
 
 #install imposm as per http://imposm.org/docs/imposm/latest/install.html
+sudo aptitude install build-essential python-dev protobuf-compiler \
+                      libprotobuf-dev libtokyocabinet-dev python-psycopg2 \
+                      libgeos-c1 \
+libgdal1-dev libspatialindex-dev python-pip
+sudo pip install imposm
+pip install rtree
+imposm --read --write --deploy-production-tables --optimize great-britain-latest.osm.pbf -d osm -U osm --overwrite-cache
 # MUST be version 2.6 with shapely speedups, not 2.5!
-# edit pg_hba.conf to use md5 authentication and create user osm with password osm (imposm's default)
+
 e.g.
 sudo -u postgres psql -c "create user osm with superuser password 'osm'"
-
-sudo apt-get install postgresql postgresql-contrib postgis postgresql-9.3-postgis-2.1 osmosis
-sudo service postgresql stop && sudo mv /var/lib/postgresql/9.3/main /disk1/postgresql
-# !! Change postgresql data location in /etc/postgresql/9.3/main/postgresql.conf
-sudo service postgresql start
 
 sudo -u postgres psql -c  "create user ubuntu --superuser"
 sudo -u postgres createdb osm
@@ -79,7 +83,7 @@ psql osm -c "insert into urbanness(ru_def_des, geom2) select 'U_CT', ST_Transfor
 
 psql osm -U osm -f urbanclassifications.sql
 
-#indexes:
+#indexes (must have done imposm!):
 psql osm -U osm -f indexes.sql
 
 
