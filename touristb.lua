@@ -13,7 +13,7 @@ traffic_signal_penalty=6
 lua_sql = require "luasql.postgres"           -- we will connect to a postgresql database
 sql_env = assert( lua_sql.postgres() )
 sql_con = assert( sql_env:connect("osm", "osm", "osm") ) -- you can add db user/password here if needed
-sql_con_devon = assert( sql_env:connect("osm", "osm", "osm") ) -- you can add db user/password here if needed
+sql_con_steepness = assert( sql_env:connect("osm", "osm", "osm") ) -- you can add db user/password here if needed
 print("PostGIS connection opened")
 
 
@@ -98,7 +98,7 @@ function way_function(way, result)
 		cursor:close()
 
 		local sql_query_steepness = "select maxpercentage as maxpercentage from steepness where osm_id="..wayid
-		local cursor_steepness = assert(sql_con_devon:execute(sql_query_steepness))
+		local cursor_steepness = assert(sql_con_steepness:execute(sql_query_steepness))
 		local row_steepness = cursor_steepness:fetch({}, "a")
 	--	print (sql_query_steepness)
 		if row_steepness then
