@@ -4,7 +4,7 @@ require("luaspecifics/touristb")
 
 restriction_exception_tags = { "motorcar", "motor_vehicle", "vehicle" }
 access_tags_hierachy = { "motorcar", "motor_vehicle", "vehicle", "access" }
-barrier_whitelist = { ["cattle_grid"] = true, ["border_control"] = true, ["checkpoint"] = true, ["toll_booth"] = true, ["sally_port"] = true, ["gate"] = true, ["no"] = true, ["entrance"] = true, ["cycle_barrier"] = true }
+barrier_whitelist = { ["cattle_grid"] = true, ["border_control"] = true, ["checkpoint"] = true, ["toll_booth"] = true, ["sally_port"] = true, ["gate"] = true, ["no"] = true, ["entrance"] = true, ["cycle_barrier"] = true, ["lift_gate"] = true }
 access_tag_blacklist = { ["no"] = true, ["private"] = true, ["agricultural"] = true, ["forestry"] = true, ["emergency"] = true }
 
 traffic_signal_penalty=6
