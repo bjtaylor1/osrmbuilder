@@ -2,6 +2,7 @@
 *.osm
 *.osrm
 *.osrm.*
+*.md5
 osrm-*
 *.log
 *.errlog
