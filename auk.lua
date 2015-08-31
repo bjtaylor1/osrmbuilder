@@ -4,7 +4,7 @@ require("luaspecifics/auk")
 
 restriction_exception_tags = { "motorcar", "motor_vehicle", "vehicle" }
 access_tags_hierachy = { "motorcar", "motor_vehicle", "vehicle", "access" }
-barrier_whitelist = { ["cattle_grid"] = true, ["border_control"] = true, ["checkpoint"] = true, ["toll_booth"] = true, ["sally_port"] = true, ["gate"] = true, ["no"] = true, ["entrance"] = true }
+barrier_whitelist = { ["cattle_grid"] = true, ["border_control"] = true, ["checkpoint"] = true, ["toll_booth"] = true, ["sally_port"] = true, ["gate"] = true, ["no"] = true, ["entrance"] = true, ["lift_gate"] = true }
 access_tag_blacklist = { ["no"] = true, ["private"] = true, ["agricultural"] = true, ["forestry"] = true, ["emergency"] = true }
 
 maxspeed_table_default = {
