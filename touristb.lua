@@ -79,7 +79,7 @@ function way_function(way, result)
 		local wayid = way:id()
 		--local sql_query = "select b.ScoreCar + (b.ScoreHGV * 2.5) as score from osm_roads o join busyness b on o.ref = b.ref and ST_Intersects(o.geometry, b.geometry) where o.osm_id = " .. wayid
 --		local sql_query = "select category from osm_roads o join busyness b on o.ref = b.ref and ST_Intersects(o.geometry, b.geometry) where o.osm_id = " .. wayid
-		local sql_query = "select min(ud.score) as score  from urbanness u join urbanness_defs ud on u.ru_def_des = ud.ru_def_des join osm_roads r on ST_Intersects(r.geometry, u.geom2) where r.osm_id = "..wayid
+		local sql_query = "select score  from urbannessscores where osm_id = "..wayid
 
 --		print("running sql:"..sql_query)
 
@@ -170,9 +170,6 @@ function get_speed (way)
 
   -- Set the avg speed on the way if it is accessible by road class
   if (touristb.speed_profile[highway] ~= nil ) then
-			if wayid == 4440504 then
-				print("wayid="..wayid..", highway="..highway..", maxspeed="..max_speed)
-			end
  
 			if ("trunk" == highway or "trunk_link" == highway) and max_speed ~= nil and max_speed <= 65 then
 				return touristb.speed_profile["primary"] --urban DC's = not that bad
