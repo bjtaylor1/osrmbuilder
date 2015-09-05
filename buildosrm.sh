@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 cd ..
 rm -rf Project-OSRM
 git clone https://github.com/bjtaylor1/osrm-backend Project-OSRM --branch master
