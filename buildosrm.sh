@@ -2,7 +2,7 @@
 
 cd ..
 rm -rf Project-OSRM
-git clone https://github.com/bjtaylor1/osrm-backend Project-OSRM --branch master
+git clone https://github.com/Project-OSRM/osrm-backend Project-OSRM
 
 cd Project-OSRM
 
