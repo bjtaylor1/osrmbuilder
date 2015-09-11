@@ -18,3 +18,4 @@ touristb/
 *.cache
 urbannessdata_scotland/
 urbannessdata/
+*.dump

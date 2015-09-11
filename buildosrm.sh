@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 cd ..
 rm -rf Project-OSRM
 git clone https://github.com/Project-OSRM/osrm-backend Project-OSRM
