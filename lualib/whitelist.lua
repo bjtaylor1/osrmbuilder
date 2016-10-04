@@ -8,7 +8,8 @@ whitelist_ways_by_id = {
 --humber bridge
 [45856879] = true,
 [32065801] = true,
-[13008664] - true,
+[13008664] = true,
+[13008667] = true, --steps, but the loopy one near them doesn't seem to work
 [13008676] = true,
 [13008702] = true,
 [13008703] = true,
