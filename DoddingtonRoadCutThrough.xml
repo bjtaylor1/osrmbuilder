@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osmChange version="0.6" generator="OpenStreetMap server" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">
+  <create>
+    <node id="4430444115" changeset="42623681" timestamp="2016-10-04T08:57:02Z" version="1" visible="true" user="bentaylor" uid="538375" lat="53.2317414" lon="-0.6577259"/>
+  </create>
+  <create>
+    <node id="4430444116" changeset="42623681" timestamp="2016-10-04T08:57:02Z" version="1" visible="true" user="bentaylor" uid="538375" lat="53.2321556" lon="-0.6583053"/>
+  </create>
+  <create>
+    <node id="4430444117" changeset="42623681" timestamp="2016-10-04T08:57:02Z" version="1" visible="true" user="bentaylor" uid="538375" lat="53.2320689" lon="-0.6582382"/>
+  </create>
+  <create>
+    <node id="4430444118" changeset="42623681" timestamp="2016-10-04T08:57:02Z" version="1" visible="true" user="bentaylor" uid="538375" lat="53.2315509" lon="-0.6573345">
+      <tag k="barrier" v="gate"/>
+    </node>
+  </create>
+  <create>
+    <node id="4430444119" changeset="42623681" timestamp="2016-10-04T08:57:02Z" version="1" visible="true" user="bentaylor" uid="538375" lat="53.2322218" lon="-0.6584822"/>
+  </create>
+  <create>
+    <way id="445642019" changeset="42623681" timestamp="2016-10-04T08:57:02Z" version="1" visible="true" user="bentaylor" uid="538375">
+      <nd ref="2271990312"/>
+      <nd ref="4430444118"/>
+      <nd ref="4430444115"/>
+      <nd ref="4430444117"/>
+      <nd ref="4430444116"/>
+      <nd ref="4430444119"/>
+      <nd ref="192709140"/>
+      <tag k="highway" v="path"/>
+      <tag k="surface" v="unpaved"/>
+    </way>
+  </create>
+</osmChange>

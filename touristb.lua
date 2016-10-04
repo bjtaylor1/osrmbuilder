@@ -52,6 +52,9 @@ local obey_oneway = true
 
 
 function way_function(way, result)
+  result.forward_mode = mode.driving
+  result.backward_mode = mode.driving
+
 	  -- check if oneway tag is unsupported
   local oneway = way:get_value_by_key("oneway")
 	local highway = way:get_value_by_key("highway")

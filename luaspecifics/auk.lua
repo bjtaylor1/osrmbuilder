@@ -1,4 +1,5 @@
 module "auk"
+whitelist_speed = 17
 
 speed_profile = {
   ["trunk"] = 17,

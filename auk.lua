@@ -42,6 +42,9 @@ local obey_oneway = true
 
 
 function way_function(way, result)
+  result.forward_mode = mode.driving
+  result.backward_mode = mode.driving
+
 	  -- check if oneway tag is unsupported
   local oneway = way:get_value_by_key("oneway")
 	local highway = way:get_value_by_key("highway")
@@ -69,6 +72,7 @@ function way_function(way, result)
 end
 
 function get_speed (way)
+local wayid = way:id()
 
 	local highway = way:get_value_by_key("highway")
   local junction = way:get_value_by_key("junction")
@@ -80,11 +84,14 @@ function get_speed (way)
 	end
 
 --special ways override everything else and we can go max (unclassified) speed on them
-  if(Whitelist.whitelist_ways_by_id[way.id]) then
-    return speed_unclassified
+--print("whitelist = "..Whitelist.whitelist_way_by_id[wayid])
+
+  if(Whitelist.whitelist_ways_by_id[wayid]) then
+	print("whitelisted "..wayid.." - returning "..auk.whitelist_speed)
+	return auk.whitelist_speed
   end
 
-  if(Blacklist.blacklist_ways_by_id[way.id]) then
+  if(Blacklist.blacklist_ways_by_id[wayid]) then
     return -1
   end
 

@@ -2,7 +2,13 @@
 module "Whitelist"
 
 whitelist_ways_by_id = {
+--doddington road cut through
+[445642019] = true,
+
 --humber bridge
+[45856879] = true,
+[32065801] = true,
+[13008664] - true,
 [13008676] = true,
 [13008702] = true,
 [13008703] = true,
@@ -36,6 +42,9 @@ whitelist_ways_by_id = {
 [231255564] = true,
 [231391849] = true,
 [234118069] = true,
+[23162559] = true,
+[13008663] = true,
+
 
 --fledborough viaduct:
 [172760514] = true,
