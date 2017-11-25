@@ -83,4 +83,5 @@ psql osm -U osm -f urbanclassifications.sql
 #indexes (must have done imposm!):
 psql osm -U osm -f indexes.sql
 
-
+#urbanness scores
+psql osm -U osm -f createurbannessscorestable.sql
