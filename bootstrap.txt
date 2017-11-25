@@ -27,7 +27,7 @@ sudo apt-get install unzip build-essential git cmake pkg-config libprotoc-dev li
 protobuf-compiler libprotobuf-dev libosmpbf-dev libpng12-dev \
 libbz2-dev libstxxl-dev libstxxl-doc libstxxl1 libxml2-dev \
 libzip-dev libboost-all-dev lua5.1 liblua5.1-0-dev libluabind-dev libluajit-5.1-dev libtbb-dev \
-postgresql postgresql-contrib postgis postgresql-9.3-postgis-2.1 osmosis lua-sql-postgres lua-sql-postgres-dev osmctools
+postgresql postgresql-contrib postgis postgresql-9.5-postgis-2.2 osmosis lua-sql-postgres lua-sql-postgres-dev osmctools
 
 disk=/disk1/stxxldata,712750,syscall
 disk=/disk2/stxxldata,712750,syscall
@@ -43,7 +43,7 @@ for each disk available (number is in MB)
 #install imposm as per http://imposm.org/docs/imposm/latest/install.html
 sudo aptitude install build-essential python-dev protobuf-compiler \
                       libprotobuf-dev libtokyocabinet-dev python-psycopg2 \
-                      libgeos-c1 \
+                      libgeos-c1v5 \
 libgdal1-dev libspatialindex-dev python-pip
 sudo pip install imposm
 pip install rtree
