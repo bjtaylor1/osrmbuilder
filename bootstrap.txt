@@ -54,11 +54,8 @@ e.g.
 sudo -u postgres psql -c "create user osm with superuser password 'osm'"
 
 sudo -u postgres psql -c  "create user ubuntu --superuser"
-sudo -u postgres createdb osm
-echo "\set ON_ERROR_STOP on">>~/.psqlrc
 
-sudo -u postgres psql -d osm -c "CREATE EXTENSION postgis;"
-sudo -u postgres psql -d osm -c "CREATE EXTENSION postgis_topology;"
+sudo -u postgres ./createimposmdb.sh
 
 git clone http://github.com/bjtaylor1/osrmbuilder
 cd osrmbuilder
