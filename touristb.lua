@@ -4,16 +4,13 @@ require("luaspecifics/touristb")
 
 restriction_exception_tags = { "motorcar", "motor_vehicle", "vehicle" }
 access_tags_hierachy = { "motorcar", "motor_vehicle", "vehicle", "access" }
-barrier_whitelist = { ["cattle_grid"] = true, ["border_control"] = true, ["checkpoint"] = true, ["toll_booth"] = true, ["sally_port"] = true, ["gate"] = true, ["no"] = true, ["entrance"] = true, ["cycle_barrier"] = true, ["lift_gate"] = true }
+barrier_whitelist = { ["cattle_grid"] = true, ["border_control"] = true, ["checkpoint"] = true, ["toll_booth"] = true, ["sally_port"] = true, ["gate"] = true, ["no"] = true, ["entrance"] = true, ["lift_gate"] = true }
 access_tag_blacklist = { ["no"] = true, ["private"] = true, ["agricultural"] = true, ["forestry"] = true, ["emergency"] = true }
-
-traffic_signal_penalty=6
 
 -- Open PostGIS connection
 lua_sql = require "luasql.postgres"           -- we will connect to a postgresql database
 sql_env = assert( lua_sql.postgres() )
 sql_con = assert( sql_env:connect("osm", "osm", "osm") ) -- you can add db user/password here if needed
-sql_con_steepness = assert( sql_env:connect("osm", "osm", "osm") ) -- you can add db user/password here if needed
 print("PostGIS connection opened")
 
 
@@ -76,12 +73,9 @@ function way_function(way, result)
     end
   end
 	local thespeed = get_speed(way)
-	local staticpenalty = 0
 
 	if thespeed ~= nil and thespeed > 0 then
 		local wayid = way:id()
-		--local sql_query = "select b.ScoreCar + (b.ScoreHGV * 2.5) as score from osm_roads o join busyness b on o.ref = b.ref and ST_Intersects(o.geometry, b.geometry) where o.osm_id = " .. wayid
---		local sql_query = "select category from osm_roads o join busyness b on o.ref = b.ref and ST_Intersects(o.geometry, b.geometry) where o.osm_id = " .. wayid
 		local sql_query = "select score  from urbannessscores where osm_id = "..wayid
 
 --		print("running sql:"..sql_query)
@@ -93,48 +87,21 @@ function way_function(way, result)
 
 			if score ~= nil then
 				local thenewspeed = thespeed * score
---				print("thespeed="..thespeed..", thenewspeed="..thenewspeed)
 				thespeed = thenewspeed
 			end
 	
 		end
 		cursor:close()
-
-		local sql_query_steepness = "select maxpercentage as maxpercentage from steepness where osm_id="..wayid
-		local cursor_steepness = assert(sql_con_steepness:execute(sql_query_steepness))
-		local row_steepness = cursor_steepness:fetch({}, "a")
-	--	print (sql_query_steepness)
-		if row_steepness then
-			local maxpercentage = tonumber(row_steepness.maxpercentage)
-			if maxpercentage >= 0.15 and maxpercentage < 0.16 then
-				thespeed = thespeed * 0.8
-			end
-			if maxpercentage >= 0.16 and maxpercentage < 0.17 then
-				thespeed = thespeed * 0.4
-			end
-			if maxpercentage >= 0.17 and maxpercentage < 0.18 then
-				thespeed = thespeed * 0.2
-			end
-			if maxpercentage >= 0.18 and maxpercentage < 0.19 then
-				thespeed = thespeed * 0.2
-			end
-			if maxpercentage >= 0.19 and maxpercentage < 0.20 then
-				thespeed = thespeed * 0.1
-			end
-			if maxpercentage >= 0.20 then
-				thespeed = thespeed * 0.05
-			end
- 
-		end
-		cursor_steepness:close()
 	end
-result.forward_speed = thespeed
+
+
+	result.forward_speed = thespeed
 	result.backward_speed = thespeed
-	result.duration = staticpenalty
 
 end
 
 function get_speed (way)
+local wayid = way:id()
 
 	local highway = way:get_value_by_key("highway")
   local junction = way:get_value_by_key("junction")
@@ -146,9 +113,11 @@ function get_speed (way)
 	end
 
 --special ways override everything else and we can go max (unclassified) speed on them
-	local wayid = way:id()
+--print("whitelist = "..Whitelist.whitelist_way_by_id[wayid])
+
   if(Whitelist.whitelist_ways_by_id[wayid]) then
-    return touristb.whitelist_speed
+	print("whitelisted "..wayid.." - returning "..touristb.whitelist_speed)
+	return touristb.whitelist_speed
   end
 
   if(Blacklist.blacklist_ways_by_id[wayid]) then
@@ -167,18 +136,12 @@ function get_speed (way)
 	local max_speed = parse_maxspeed( way:get_value_by_key("maxspeed") )
 
   if max_speed ~= nil and max_speed >= 112 and "roundabout" ~= junction then --112 = 70 mph
-		--it's a de-facto motorway, we don't want to cycle on that
     return -1
   end
 
   -- Set the avg speed on the way if it is accessible by road class
   if (touristb.speed_profile[highway] ~= nil ) then
- 
-			if ("trunk" == highway or "trunk_link" == highway) and max_speed ~= nil and max_speed <= 65 then
-				return touristb.speed_profile["primary"] --urban DC's = not that bad
-			else
-	      return touristb.speed_profile[highway]
-			end
+      return touristb.speed_profile[highway]
 	else
 		return -1
   end
@@ -261,17 +224,18 @@ function parse_maxspeed(source)
 end
 
 
+
 turn_penalty = 60
 turn_bias      = 1.4
 
 function turn_function (angle)
-		if angle > 75 or angle < -75 then
-			return 350
+--		if angle > 75 or angle < -75 then
+--			return 350
 --		elseif angle > 45 or angle < -45 then
 --			return 200
-		else
+--		else
 			return 0 
-		end
+--		end
 end
 
 function turn_function_alt(angle)

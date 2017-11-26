@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-for routetype in auk touristb; do
+for routetype in touristb; do
   echo Preparing $routetype
 	rm -rf $routetype
 	mkdir $routetype

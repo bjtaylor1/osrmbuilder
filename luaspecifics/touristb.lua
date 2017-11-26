@@ -34,7 +34,6 @@ function get_specific_speed(way)
   local bikesallowed = ("yes" == bicycle or "permissive" == bicycle or "designated" == bicycle or "destination" == bicycle)
   local name = way:get_value_by_key("name")
   local highway = way:get_value_by_key("highway")
-  local descriptor = highway.." "..surface.." "..bicycle.." "..name
   if ("asphalt" == surface or "paved" == surface) and 
 	("cycleway" == highway or
 		("track" == highway and bikesallowed) or
