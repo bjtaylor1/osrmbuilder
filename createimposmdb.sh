@@ -1,7 +1,7 @@
 # run this as postgres user, eg:
 # imposm-psqldb > create_db.sh; sudo su postgres; sh ./create_db.sh
 set -x
-#createuser --no-superuser --no-createrole --createdb osm
+createuser --no-superuser --no-createrole --createdb osm
 createdb -E UTF8 -O osm osm
 createlang plpgsql osm
 psql -d osm -f /usr/share/postgresql/9.5/contrib/postgis-2.2/postgis.sql 				# <- CHANGE THIS PATH
