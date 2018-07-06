@@ -134,6 +134,24 @@ function setup()
       path = 12
     },
 
+
+    is_road = Sequence {
+        motorway        = true,
+        motorway_link   = true,
+        trunk           = true,
+        trunk_link      = true,
+        primary         = true,
+        primary_link    = true,
+        secondary       = true,
+        secondary_link  = true,
+        tertiary        = true,
+        tertiary_link   = true,
+        unclassified    = true,
+        residential     = true,
+        living_street   = true,
+        service         = true
+    },
+
     pedestrian_speeds = {
       footway = walking_speed,
       pedestrian = walking_speed,
@@ -172,21 +190,21 @@ function setup()
 
     surface_speeds = {
       asphalt = default_speed,
-      ["cobblestone:flattened"] = 10,
-      paving_stones = 10,
-      compacted = 10,
-      cobblestone = 6,
-      unpaved = 6,
-      fine_gravel = 6,
-      gravel = 6,
-      pebblestone = 6,
-      ground = 6,
-      dirt = 6,
-      earth = 6,
-      grass = 6,
-      mud = 3,
-      sand = 3,
-      sett = 10
+      ["cobblestone:flattened"] = default_speed,
+      paving_stones = default_speed,
+      compacted = 0,
+      cobblestone = 0,
+      unpaved = 0,
+      fine_gravel = 0,
+      gravel = 0,
+      pebblestone = 0,
+      ground = 0,
+      dirt = 0,
+      earth = 0,
+      grass = 0,
+      mud = 0,
+      sand = 0,
+      sett = 0
     },
 
     classes = Sequence {
@@ -255,6 +273,8 @@ function process_node(profile, node, result)
 end
 
 function handle_bicycle_tags(profile,way,result,data)
+  io.write("handle_bicycle_tags.."..way:id().."\n")
+
     -- initial routability check, filters out buildings, boundaries, etc
   data.route = way:get_value_by_key("route")
   data.man_made = way:get_value_by_key("man_made")
@@ -644,6 +664,9 @@ function process_way(profile, way, result)
     -- compute speed taking into account way type, maxspeed tags, etc.
     WayHandlers.surface,
 
+    -- new handler to reject anything that isn't a surface we like, including unknown surfaces.
+    unknown_surface_handler,
+
     -- handle turn lanes and road classification, used for guidance
     WayHandlers.classification,
 
@@ -664,6 +687,18 @@ function process_way(profile, way, result)
   }
 
   WayHandlers.run(profile, way, result, data, handlers)
+end
+
+function unknown_surface_handler(profile,way,result,data)
+  if not profile.is_road[data.highway] then
+
+    local surface = way:get_value_by_key("surface")
+    --io.write("unknown_surface_handler "..way:id()..", surface="..surface.."\n")
+    if surface == nil or (profile.surface_speeds[surface] == nil or profile.surface_speeds[surface] == 0) then
+      io.write("rejecting "..way:id().."\n")
+      return false
+    end
+  end
 end
 
 function process_turn(profile, turn)
@@ -691,18 +726,20 @@ function process_turn(profile, turn)
 end
 
 function get_elevation(loc)
-  local sql_query = "select elevation from results order by location <-> ST_SetSRID(ST_MakePoint(" .. loc.lon .. "," .. loc.lat .. "),4326) limit 1;"
+  local sql_query = "select id,elevation from results order by location <-> ST_SetSRID(ST_MakePoint(" .. loc.lon .. "," .. loc.lat .. "),4326) limit 1;"
   local cursor = assert(sql_con:execute(sql_query));
   local row = cursor:fetch( {}, "a")
-  return row.elevation
+  return row
 end
 
 function process_segment(profile, segment)
   local source_elevation = get_elevation(segment.source)
   local target_elevation = get_elevation(segment.target)
-  local height_gain = target_elevation - source_elevation;
-  local gradient = height_gain / segment.distance
-  io.write(segment.source.lat..","..segment.source.lon..","..segment.target.lat..","..segment.target.lon..","..height_gain..","..segment.distance..","..gradient..","..segment.duration..","..segment.weight.."\n")
+  if source_elevation.id ~= target_elevation.id then
+    local height_gain = target_elevation.elevation - source_elevation.elevation
+    local gradient = height_gain / segment.distance
+    io.write("result,"..segment.source.lat..","..segment.source.lon..","..segment.target.lat..","..segment.target.lon..","..height_gain..","..segment.distance..","..gradient..","..segment.duration..","..segment.weight..","..source_elevation.id..","..target_elevation.id.."\n")
+  end
 end
 
 return {
