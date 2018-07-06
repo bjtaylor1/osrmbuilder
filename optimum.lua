@@ -8,13 +8,10 @@ Handlers = require("lib/way_handlers")
 find_access_tag = require("lib/access").find_access_tag
 limit = require("lib/maxspeed").limit
 
--- Open PostGIS connection
-lua_sql = require "luasql.postgres"           -- we will connect to a postgresql database
-sql_env = assert( lua_sql.postgres() )
-sql_con = assert( sql_env:connect("elevation", "osm", "osm") ) -- you can add db user/password here if needed
-print("PostGIS connection opened")
-
 function setup()
+
+  local raster_path = os.getenv('OSRM_RASTER_SOURCE') or "rastersource.asc"
+
   local default_speed = 15
   local walking_speed = 4
 
@@ -29,7 +26,19 @@ function setup()
       use_turn_restrictions         = false,
       continue_straight_at_waypoint = false,
       mode_change_penalty           = 30,
+      force_split_edges = true,
+      process_call_tagless_node = false
     },
+
+    raster_source = raster:load(
+      raster_path,
+      -5,    -- lon_min
+      0,  -- lon_max
+      50,    -- lat_min
+      55,  -- lat_max
+      6001,    -- nrows
+      6001     -- ncols
+    ),
 
     default_mode              = mode.cycling,
     default_speed             = default_speed,
@@ -130,8 +139,8 @@ function setup()
       living_street = default_speed,
       road = default_speed,
       service = default_speed,
-      track = 12,
-      path = 12
+      track = default_speed,
+      path = default_speed
     },
 
 
@@ -273,7 +282,6 @@ function process_node(profile, node, result)
 end
 
 function handle_bicycle_tags(profile,way,result,data)
-  io.write("handle_bicycle_tags.."..way:id().."\n")
 
     -- initial routability check, filters out buildings, boundaries, etc
   data.route = way:get_value_by_key("route")
@@ -535,6 +543,10 @@ function bike_push_handler(profile,way,result,data)
 end
 
 function safety_handler(profile,way,result,data)
+  if data.maxspeed > 110 then
+    return false
+  end
+
   -- convert duration into cyclability
   if profile.properties.weight_name == 'cyclability' then
     local safety_penalty = profile.unsafe_highway_list[data.highway] or 1.
@@ -725,21 +737,27 @@ function process_turn(profile, turn)
   end
 end
 
-function get_elevation(loc)
-  local sql_query = "select id,elevation from results order by location <-> ST_SetSRID(ST_MakePoint(" .. loc.lon .. "," .. loc.lat .. "),4326) limit 1;"
-  local cursor = assert(sql_con:execute(sql_query));
-  local row = cursor:fetch( {}, "a")
-  return row
-end
+functions.process_segment = function(profile, segment)
+  local sourceData = raster:interpolate(profile.raster_source, segment.source.lon, segment.source.lat)
+  local targetData = raster:interpolate(profile.raster_source, segment.target.lon, segment.target.lat)
+  io.write("evaluating segment: " .. sourceData.datum .. " " .. targetData.datum .. "\n")
+  local invalid = sourceData.invalid_data()
+  local scaled_weight = segment.weight
+  local scaled_duration = segment.duration
 
-function process_segment(profile, segment)
-  local source_elevation = get_elevation(segment.source)
-  local target_elevation = get_elevation(segment.target)
-  if source_elevation.id ~= target_elevation.id then
-    local height_gain = target_elevation.elevation - source_elevation.elevation
-    local gradient = height_gain / segment.distance
-    io.write("result,"..segment.source.lat..","..segment.source.lon..","..segment.target.lat..","..segment.target.lon..","..height_gain..","..segment.distance..","..gradient..","..segment.duration..","..segment.weight..","..source_elevation.id..","..target_elevation.id.."\n")
+  if sourceData.datum ~= invalid and targetData.datum ~= invalid then
+    local slope = math.abs(sourceData.datum - targetData.datum) / segment.distance
+    io.write("   slope: " .. slope .. "\n")
+    io.write("   was weight: " .. segment.weight .. "\n")
+    io.write("   was speed: " .. segment.duration .. "\n")
+
+    scaled_weight = scaled_weight / (1 - (slope * 5))
+    io.write("   new weight: " .. scaled_weight .. "\n")
+    scaled_duration = scaled_duration / (1 - (slope * 5))
+    io.write("   new speed: " .. scaled_duration .. "\n\n")
   end
+  segment.weight = scaled_weight
+  segment.duration = scaled_duration
 end
 
 return {
