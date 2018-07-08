@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-for routetype in flattest; do
+for routetype in optimum ; do
   echo Preparing $routetype
 	rm -rf $routetype
 	mkdir $routetype

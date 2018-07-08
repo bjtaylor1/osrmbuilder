@@ -1,5 +1,5 @@
 
-module "Whitelist"
+module "SurfaceWhitelist"
 
 whitelist_ways_by_id = {
 --doddington road cut through
