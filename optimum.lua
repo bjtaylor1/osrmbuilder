@@ -10,7 +10,7 @@ limit = require("lib/maxspeed").limit
 
 function setup()
 
-  local raster_path = os.getenv('OSRM_RASTER_SOURCE') or "rastersource.asc"
+  local raster_path = '/home/ben/rasters/rastersource.asc'
 
   local default_speed = 15
   local walking_speed = 4
@@ -128,6 +128,7 @@ function setup()
 
     bicycle_speeds = {
       cycleway = default_speed,
+      trunk = default_speed,
       primary = default_speed,
       primary_link = default_speed,
       secondary = default_speed,
@@ -279,6 +280,7 @@ function process_node(profile, node, result)
   if tag and "traffic_signals" == tag then
     result.traffic_lights = true
   end
+  local id = node:id()
 end
 
 function handle_bicycle_tags(profile,way,result,data)
@@ -332,7 +334,6 @@ function handle_bicycle_tags(profile,way,result,data)
 
   cycleway_handler(profile,way,result,data)
 
-  bike_push_handler(profile,way,result,data)
 
 
   -- maxspeed
@@ -350,7 +351,13 @@ function handle_bicycle_tags(profile,way,result,data)
   safety_handler(profile,way,result,data)
 end
 
-
+function debug_way(way, result, data, msg)
+--  local id = way:id()
+--  if id == 28954758 or id == 28954730 then
+--    local access = data.access or '(nil)'
+--    io.write(tostring(id)..": "..msg..", forward_speed = "..result.forward_speed..", backward_speed = "..result.backward_speed..", access = "..access.."\n")
+--  end 
+end
 
 function speed_handler(profile,way,result,data)
 
@@ -366,6 +373,7 @@ function speed_handler(profile,way,result,data)
     result.forward_speed = bridge_speed
     result.backward_speed = bridge_speed
     data.way_type_allows_pushing = true
+    debug_way(way,result,data, "1")
   elseif profile.route_speeds[data.route] then
     -- ferries (doesn't cover routes tagged using relations)
     result.forward_mode = mode.ferry
@@ -376,37 +384,44 @@ function speed_handler(profile,way,result,data)
        result.forward_speed = profile.route_speeds[data.route]
        result.backward_speed = profile.route_speeds[data.route]
     end
+    debug_way(way,result,data, "2")
   -- railway platforms (old tagging scheme)
   elseif data.railway and profile.platform_speeds[data.railway] then
     result.forward_speed = profile.platform_speeds[data.railway]
     result.backward_speed = profile.platform_speeds[data.railway]
     data.way_type_allows_pushing = true
+    debug_way(way,result,data, "3")
   -- public_transport platforms (new tagging platform)
   elseif data.public_transport and profile.platform_speeds[data.public_transport] then
     result.forward_speed = profile.platform_speeds[data.public_transport]
     result.backward_speed = profile.platform_speeds[data.public_transport]
     data.way_type_allows_pushing = true
+    debug_way(way,result,data, "4")
   -- railways
   elseif profile.use_public_transport and data.railway and profile.railway_speeds[data.railway] and profile.access_tag_whitelist[data.access] then
     result.forward_mode = mode.train
     result.backward_mode = mode.train
     result.forward_speed = profile.railway_speeds[data.railway]
     result.backward_speed = profile.railway_speeds[data.railway]
+    debug_way(way,result,data, "5")
   elseif data.amenity and profile.amenity_speeds[data.amenity] then
     -- parking areas
     result.forward_speed = profile.amenity_speeds[data.amenity]
     result.backward_speed = profile.amenity_speeds[data.amenity]
     data.way_type_allows_pushing = true
+    debug_way(way,result,data, "6")
   elseif profile.bicycle_speeds[data.highway] then
     -- regular ways
     result.forward_speed = profile.bicycle_speeds[data.highway]
     result.backward_speed = profile.bicycle_speeds[data.highway]
     data.way_type_allows_pushing = true
+    debug_way(way,result,data, "7")
   elseif data.access and profile.access_tag_whitelist[data.access]  then
     -- unknown way, but valid access tag
     result.forward_speed = profile.default_speed
     result.backward_speed = profile.default_speed
     data.way_type_allows_pushing = true
+    debug_way(way,result,data, "8")
   end
 end
 
@@ -488,59 +503,6 @@ function cycleway_handler(profile,way,result,data)
   end
 end
 
-function bike_push_handler(profile,way,result,data)
-  -- pushing bikes - if no other mode found
-  if result.forward_mode == mode.inaccessible or result.backward_mode == mode.inaccessible or
-    result.forward_speed == -1 or result.backward_speed == -1 then
-    if data.foot ~= 'no' then
-      local push_forward_speed = nil
-      local push_backward_speed = nil
-
-      if profile.pedestrian_speeds[data.highway] then
-        push_forward_speed = profile.pedestrian_speeds[data.highway]
-        push_backward_speed = profile.pedestrian_speeds[data.highway]
-      elseif data.man_made and profile.man_made_speeds[data.man_made] then
-        push_forward_speed = profile.man_made_speeds[data.man_made]
-        push_backward_speed = profile.man_made_speeds[data.man_made]
-      else
-        if data.foot == 'yes' then
-          push_forward_speed = profile.walking_speed
-          if not data.implied_oneway then
-            push_backward_speed = profile.walking_speed
-          end
-        elseif data.foot_forward == 'yes' then
-          push_forward_speed = profile.walking_speed
-        elseif data.foot_backward == 'yes' then
-          push_backward_speed = profile.walking_speed
-        elseif data.way_type_allows_pushing then
-          push_forward_speed = profile.walking_speed
-          if not data.implied_oneway then
-            push_backward_speed = profile.walking_speed
-          end
-        end
-      end
-
-      if push_forward_speed and (result.forward_mode == mode.inaccessible or result.forward_speed == -1) then
-        result.forward_mode = mode.pushing_bike
-        result.forward_speed = push_forward_speed
-      end
-      if push_backward_speed and (result.backward_mode == mode.inaccessible or result.backward_speed == -1)then
-        result.backward_mode = mode.pushing_bike
-        result.backward_speed = push_backward_speed
-      end
-
-    end
-
-  end
-
-  -- dismount
-  if data.bicycle == "dismount" then
-    result.forward_mode = mode.pushing_bike
-    result.backward_mode = mode.pushing_bike
-    result.forward_speed = profile.walking_speed
-    result.backward_speed = profile.walking_speed
-  end
-end
 
 function safety_handler(profile,way,result,data)
   if data.maxspeed > 110 then
@@ -707,7 +669,6 @@ function unknown_surface_handler(profile,way,result,data)
     local surface = way:get_value_by_key("surface")
     --io.write("unknown_surface_handler "..way:id()..", surface="..surface.."\n")
     if surface == nil or (profile.surface_speeds[surface] == nil or profile.surface_speeds[surface] == 0) then
-      io.write("rejecting "..way:id().."\n")
       return false
     end
   end
@@ -737,24 +698,18 @@ function process_turn(profile, turn)
   end
 end
 
-functions.process_segment = function(profile, segment)
+function process_segment(profile, segment)
   local sourceData = raster:interpolate(profile.raster_source, segment.source.lon, segment.source.lat)
   local targetData = raster:interpolate(profile.raster_source, segment.target.lon, segment.target.lat)
-  io.write("evaluating segment: " .. sourceData.datum .. " " .. targetData.datum .. "\n")
   local invalid = sourceData.invalid_data()
   local scaled_weight = segment.weight
   local scaled_duration = segment.duration
 
   if sourceData.datum ~= invalid and targetData.datum ~= invalid then
     local slope = math.abs(sourceData.datum - targetData.datum) / segment.distance
-    io.write("   slope: " .. slope .. "\n")
-    io.write("   was weight: " .. segment.weight .. "\n")
-    io.write("   was speed: " .. segment.duration .. "\n")
 
     scaled_weight = scaled_weight / (1 - (slope * 5))
-    io.write("   new weight: " .. scaled_weight .. "\n")
     scaled_duration = scaled_duration / (1 - (slope * 5))
-    io.write("   new speed: " .. scaled_duration .. "\n\n")
   end
   segment.weight = scaled_weight
   segment.duration = scaled_duration
