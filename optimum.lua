@@ -357,7 +357,7 @@ function handle_bicycle_tags(profile,way,result,data)
 
   cycleway_handler(profile,way,result,data)
 
-
+  safety_handler(profile,way,result,data)
 
   -- maxspeed
   limit( result, data.maxspeed, data.maxspeed_forward, data.maxspeed_backward )
@@ -371,7 +371,6 @@ function handle_bicycle_tags(profile,way,result,data)
     result.backward_mode = mode.inaccessible
   end
 
-  safety_handler(profile,way,result,data)
 end
 
 function debug_way(way, result, data, msg)
