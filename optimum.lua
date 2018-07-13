@@ -20,7 +20,7 @@ function setup()
   return {
     properties = {
       u_turn_penalty                = 20,
-      traffic_light_penalty         = 200,
+      traffic_light_penalty         = 40,
       weight_name                   = 'cyclability',
 --      weight_name                   = 'duration',
       process_call_tagless_node     = false,
@@ -30,6 +30,7 @@ function setup()
       mode_change_penalty           = 30,
       highway_change_penalty        = 60, --it is not worth turning off a highway onto a residential to avoid one traffic light.
                                                 -- ...but it might be worth it to avoid two or more!
+      onto_primary_penalty          = 30,
       force_split_edges = true,
       process_call_tagless_node = false
     },
@@ -370,7 +371,6 @@ function handle_bicycle_tags(profile,way,result,data)
   if result.backward_speed <= 0 and result.duration <= 0 then
     result.backward_mode = mode.inaccessible
   end
-
 end
 
 function debug_way(way, result, data, msg)
@@ -732,8 +732,15 @@ function process_turn(profile, turn)
   end
   
 
-  if turn.source_highway_turn_classification > 0  and turn.target_highway_turn_classification > 0 and turn.source_highway_turn_classification <= 7 and turn.target_highway_turn_classification >= 8 then
-    turn.weight = turn.weight + profile.properties.highway_change_penalty
+  if turn.source_highway_turn_classification > 0  and turn.target_highway_turn_classification > 0 then
+    if turn.source_highway_turn_classification <= 7 and turn.target_highway_turn_classification >= 8 then --turning onto a worse road, e.g. residential
+      turn.weight = turn.weight + profile.properties.highway_change_penalty
+    end
+
+    if turn.source_highway_turn_classification > 2 and turn.target_highway_turn_classification <= 2 then
+      turn.weight = turn.weight + profile.properties.onto_primary_penalty --if we're turning onto a primary/trunk from a non-primary/trunk,incur a penalty.
+                -- this is to avoid the coming off a main road temporarily and then back onto it again phenomenon.
+    end
   end
 end
 
