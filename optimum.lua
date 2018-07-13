@@ -12,7 +12,7 @@ require("lualib/surfacewhitelist")
 
 function setup()
 
-  local raster_path = '/home/ben/rasters/rastersource.asc'
+  local raster_path = '/home/ben/rasters/'
 
   local default_speed = 15
   local walking_speed = 4
@@ -35,15 +35,17 @@ function setup()
       process_call_tagless_node = false
     },
 
-    raster_source = raster:load(
-      raster_path,
-      -5,    -- lon_min
-      0,  -- lon_max
-      50,    -- lat_min
-      55,  -- lat_max
-      6001,    -- nrows
-      6001     -- ncols
-    ),
+    raster_sources = {
+        raster_35_03 = raster:load(raster_path..'srtm_35_03.asc', -10, -5, 45, 50, 6001, 6001),
+	raster_34_02 = raster:load(raster_path..'srtm_34_02.asc', -15,-10, 50, 55, 6001, 6001 ),
+        raster_35_02 = raster:load(raster_path..'srtm_35_02.asc', -10, -5, 50, 55, 6001, 6001),
+        raster_36_02 = raster:load(raster_path..'srtm_36_02.asc',  -5,  0, 50, 55, 6001, 6001),
+        raster_37_02 = raster:load(raster_path..'srtm_37_02.asc',   0,  5, 50, 55, 6001, 6001),
+        raster_34_01 = raster:load(raster_path..'srtm_34_01.asc', -15, -10,55, 60, 6001, 6001),
+        raster_35_01 = raster:load(raster_path..'srtm_35_01.asc', -10, -5, 55, 60, 6001, 6001),
+        raster_36_01 = raster:load(raster_path..'srtm_36_01.asc', -5,  0,  55, 60, 6001, 6001),
+        raster_37_01 = raster:load(raster_path..'srtm_37_01.asc',  0,  5,  55, 60, 6001, 6001)   
+    },
 
     default_mode              = mode.cycling,
     default_speed             = default_speed,
@@ -744,9 +746,45 @@ function process_turn(profile, turn)
   end
 end
 
+function get_raster_source(profile,pos)
+  if pos.lat >= -10 and pos.lat <= -5 and pos.lon >= 45 and pos.lon <= 50 then
+    return profile.properties.raster_sources[raster_35_03]
+
+  elseif pos.lat >= -15 and pos.lat <= -10 and pos.lon >= 50 and pos.lon <= 55 then
+    return profile.properties.raster_sources[raster_34_02]
+
+  elseif pos.lat >= -10 and pos.lat <= -5 and pos.lon >= 50 and pos.lon <= 55 then
+    return profile.properties.raster_sources[raster_35_02]
+
+  elseif pos.lat >= -5 and pos.lat <= 0 and pos.lon >= 50 and pos.lon <= 55 then
+    return profile.properties.raster_sources[raster_35_02]
+  
+  elseif pos.lat >= 0 and pos.lat <= 5 and pos.lon >= 50 and pos.lon <= 55 then
+    return profile.properties.raster_sources[raster_35_02]
+  
+  elseif pos.lat >= -15 and pos.lat <= -10 and pos.lon >= 55 and pos.lon <= 60 then
+    return profile.properties.raster_sources[raster_35_02]
+  
+  elseif pos.lat >= -10 and pos.lat <= -5 and pos.lon >= 55 and pos.lon <= 60 then
+    return profile.properties.raster_sources[raster_35_02]
+  
+  elseif pos.lat >= -5 and pos.lat <= 0 and pos.lon >= 55 and pos.lon <= 60 then
+    return profile.properties.raster_sources[raster_35_02]
+  
+  elseif pos.lat >= 0 and pos.lat <= 5 and pos.lon >= 55 and pos.lon <= 60 then
+    return profile.properties.raster_sources[raster_35_02]
+
+  else
+    error("no raster source for "..tostring(pos.lat)..","..tostring(pos.lon).."\n")
+  end
+
+end
+
 function process_segment(profile, segment)
-  local sourceData = raster:interpolate(profile.raster_source, segment.source.lon, segment.source.lat)
-  local targetData = raster:interpolate(profile.raster_source, segment.target.lon, segment.target.lat)
+  local sourceraster = get_raster_source(segment.source)
+  local targetraster = get_raster_source(segment.target)
+  local sourceData = raster:interpolate(sourceraster, segment.source.lon, segment.source.lat)
+  local targetData = raster:interpolate(targetraster, segment.target.lon, segment.target.lat)
   local invalid = sourceData.invalid_data()
   local scaled_weight = segment.weight
   local scaled_duration = segment.duration
