@@ -144,7 +144,6 @@ function setup()
       unclassified = default_speed,
       living_street = default_speed,
       road = default_speed,
-      service = default_speed,
       track = default_speed,
       path = default_speed
     },
@@ -163,8 +162,7 @@ function setup()
         tertiary_link   = true,
         unclassified    = true,
         residential     = true,
-        living_street   = true,
-        service         = true
+        living_street   = true
     },
 
     pedestrian_speeds = {
@@ -256,7 +254,6 @@ function setup()
       ['cycleway'] = 6, 
       ['track'] = 7,
       ['residential'] = 8, -- turning off <= 7 to >= 8 incurs penalty
-      ['service'] = 9,
       ['living_street'] = 10,
       ['footway'] = 11,
       ['path'] = 12,
