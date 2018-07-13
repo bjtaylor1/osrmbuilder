@@ -20,7 +20,7 @@ function setup()
   return {
     properties = {
       u_turn_penalty                = 20,
-      traffic_light_penalty         = 2,
+      traffic_light_penalty         = 200,
       weight_name                   = 'cyclability',
 --      weight_name                   = 'duration',
       process_call_tagless_node     = false,
@@ -28,6 +28,8 @@ function setup()
       use_turn_restrictions         = false,
       continue_straight_at_waypoint = false,
       mode_change_penalty           = 30,
+      highway_change_penalty        = 60, --it is not worth turning off a highway onto a residential to avoid one traffic light.
+                                                -- ...but it might be worth it to avoid two or more!
       force_split_edges = true,
       process_call_tagless_node = false
     },
@@ -117,12 +119,12 @@ function setup()
     -- only used for cyclability metric
     unsafe_highway_list = {
       trunk = 0.5,
-      primary = 0.5,
-      secondary = 0.65,
-      tertiary = 0.8,
-      primary_link = 0.5,
-      secondary_link = 0.65,
-      tertiary_link = 0.8,
+      primary = 0.6,
+--      secondary = 0.65,
+--      tertiary = 0.8,
+      primary_link = 0.6
+--      secondary_link = 0.65,
+--      tertiary_link = 0.8,
     },
 
     service_penalties = {
@@ -239,7 +241,29 @@ function setup()
     avoid = Set {
       'impassable',
       'construction'
-    }
+    }, 
+
+    highway_turn_classification = {
+      ['trunk'] = 1,
+      ['trunk_link'] = 1,
+      ['primary'] = 2,
+      ['primary_link'] = 2,
+      ['secondary'] = 3,
+      ['secondary_link'] = 3,
+      ['tertiary'] = 4,
+      ['tertiary_link'] = 4,
+      ['unclassified'] = 5,
+      ['cycleway'] = 6, 
+      ['track'] = 7,
+      ['residential'] = 8, -- turning off <= 7 to >= 8 incurs penalty
+      ['service'] = 9,
+      ['living_street'] = 10,
+      ['footway'] = 11,
+      ['path'] = 12,
+      ['pedestrian'] = 13,
+    },
+
+    access_turn_classification = {}
   }
 end
 
@@ -283,7 +307,6 @@ function process_node(profile, node, result)
   if tag and "traffic_signals" == tag then
     result.traffic_lights = true
   end
-  local id = node:id()
 end
 
 function handle_bicycle_tags(profile,way,result,data)
@@ -663,7 +686,10 @@ function process_way(profile, way, result)
     WayHandlers.classes,
 
     -- set weight properties of the way
-    WayHandlers.weights
+    WayHandlers.weights,
+
+    -- set classification of ways relevant for turns
+    WayHandlers.way_classification_for_turn
   }
 
   WayHandlers.run(profile, way, result, data, handlers)
@@ -706,6 +732,12 @@ function process_turn(profile, turn)
   end
   if turn.source_mode == mode.cycling and turn.target_mode ~= mode.cycling then
     turn.weight = turn.weight + profile.properties.mode_change_penalty
+    io.write("penalty for turning off cycling at "..tostring(turn.source.lat)..","..tostring(turn.source.lon).."\n")
+  end
+  
+
+  if turn.source_highway_turn_classification > 0  and turn.target_highway_turn_classification > 0 and turn.source_highway_turn_classification <= 7 and turn.target_highway_turn_classification >= 8 then
+    turn.weight = turn.weight + profile.properties.highway_change_penalty
   end
 end
 
