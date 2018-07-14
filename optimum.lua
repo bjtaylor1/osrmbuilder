@@ -30,13 +30,14 @@ function setup()
       mode_change_penalty           = 30,
       highway_change_penalty        = 60, --it is not worth turning off a highway onto a residential to avoid one traffic light.
                                                 -- ...but it might be worth it to avoid two or more!
-      onto_primary_penalty          = 30,
+      onto_primary_penalty          = 750, -- test 'off and on again' phenonenon on A9 (Golspie/Brora/Helmsdale/Dunbeath)
       force_split_edges = true,
       process_call_tagless_node = false
     },
 
     raster_sources = {
         raster_35_03 = raster:load(raster_path..'srtm_35_03.asc', -10, -5, 45, 50, 6001, 6001),
+        raster_36_03 = raster:load(raster_path..'srtm_36_03.asc',  -5,  0, 45, 50, 6001, 6001),
 	raster_34_02 = raster:load(raster_path..'srtm_34_02.asc', -15,-10, 50, 55, 6001, 6001 ),
         raster_35_02 = raster:load(raster_path..'srtm_35_02.asc', -10, -5, 50, 55, 6001, 6001),
         raster_36_02 = raster:load(raster_path..'srtm_36_02.asc',  -5,  0, 50, 55, 6001, 6001),
@@ -246,8 +247,8 @@ function setup()
 
     highway_turn_classification = {
       ['trunk'] = 1,
-      ['trunk_link'] = 1,
-      ['primary'] = 2,
+      ['primary'] = 1,
+      ['trunk_link'] = 2,
       ['primary_link'] = 2,
       ['secondary'] = 3,
       ['secondary_link'] = 3,
@@ -730,7 +731,6 @@ function process_turn(profile, turn)
   end
   if turn.source_mode == mode.cycling and turn.target_mode ~= mode.cycling then
     turn.weight = turn.weight + profile.properties.mode_change_penalty
-    io.write("penalty for turning off cycling at "..tostring(turn.source.lat)..","..tostring(turn.source.lon).."\n")
   end
   
 
@@ -739,64 +739,93 @@ function process_turn(profile, turn)
       turn.weight = turn.weight + profile.properties.highway_change_penalty
     end
 
-    if turn.source_highway_turn_classification > 2 and turn.target_highway_turn_classification <= 2 then
+    if turn.source_highway_turn_classification > 1 and turn.target_highway_turn_classification <= 1 then
       turn.weight = turn.weight + profile.properties.onto_primary_penalty --if we're turning onto a primary/trunk from a non-primary/trunk,incur a penalty.
                 -- this is to avoid the coming off a main road temporarily and then back onto it again phenomenon.
     end
   end
+
+  if turn.source_number_of_lanes > 2 and turn.angle > 30 and not turn.has_traffic_light then
+    -- e.g. 55.966113,-3.318558 (A90 in Edinburgh)
+    turn.weight = turn.weight + 2000
+  end
+    
 end
 
 function get_raster_source(profile,pos)
-  if pos.lat >= -10 and pos.lat <= -5 and pos.lon >= 45 and pos.lon <= 50 then
-    return profile.properties.raster_sources[raster_35_03]
+  if pos.lon >= -10 and pos.lon <= -5 and pos.lat >= 45 and pos.lat <= 50 then
+    return profile.raster_sources.raster_35_03
 
-  elseif pos.lat >= -15 and pos.lat <= -10 and pos.lon >= 50 and pos.lon <= 55 then
-    return profile.properties.raster_sources[raster_34_02]
+  elseif pos.lon >= -5 and pos.lon <= 0 and pos.lat >= 45 and pos.lat <= 50 then
+    return profile.raster_sources.raster_36_03
 
-  elseif pos.lat >= -10 and pos.lat <= -5 and pos.lon >= 50 and pos.lon <= 55 then
-    return profile.properties.raster_sources[raster_35_02]
+  elseif pos.lon >= -15 and pos.lon <= -10 and pos.lat >= 50 and pos.lat <= 55 then
+    return profile.raster_sources.raster_34_02
 
-  elseif pos.lat >= -5 and pos.lat <= 0 and pos.lon >= 50 and pos.lon <= 55 then
-    return profile.properties.raster_sources[raster_35_02]
+  elseif pos.lon >= -10 and pos.lon <= -5 and pos.lat >= 50 and pos.lat <= 55 then
+    return profile.raster_sources.raster_35_02
+
+  elseif pos.lon >= -5 and pos.lon <= 0 and pos.lat >= 50 and pos.lat <= 55 then
+    return profile.raster_sources.raster_36_02
   
-  elseif pos.lat >= 0 and pos.lat <= 5 and pos.lon >= 50 and pos.lon <= 55 then
-    return profile.properties.raster_sources[raster_35_02]
+  elseif pos.lon >= 0 and pos.lon <= 5 and pos.lat >= 50 and pos.lat <= 55 then
+    return profile.raster_sources.raster_37_02
   
-  elseif pos.lat >= -15 and pos.lat <= -10 and pos.lon >= 55 and pos.lon <= 60 then
-    return profile.properties.raster_sources[raster_35_02]
+  elseif pos.lon >= -15 and pos.lon <= -10 and pos.lat >= 55 then
+    return profile.raster_sources.raster_34_01
   
-  elseif pos.lat >= -10 and pos.lat <= -5 and pos.lon >= 55 and pos.lon <= 60 then
-    return profile.properties.raster_sources[raster_35_02]
+  elseif pos.lon >= -10 and pos.lon <= -5 and pos.lat >= 55 then
+    return profile.raster_sources.raster_35_01
   
-  elseif pos.lat >= -5 and pos.lat <= 0 and pos.lon >= 55 and pos.lon <= 60 then
-    return profile.properties.raster_sources[raster_35_02]
+  elseif pos.lon >= -5 and pos.lon <= 0 and pos.lat >= 55  then
+    return profile.raster_sources.raster_36_01
   
-  elseif pos.lat >= 0 and pos.lat <= 5 and pos.lon >= 55 and pos.lon <= 60 then
-    return profile.properties.raster_sources[raster_35_02]
+  elseif pos.lon >= 0 and pos.lon <= 5 and pos.lat >= 55 and pos.lat <= 60 then
+    return profile.raster_sources.raster_37_01
 
   else
-    error("no raster source for "..tostring(pos.lat)..","..tostring(pos.lon).."\n")
+    io.write("no raster source for "..pos.lat..","..pos.lon.."\n")    
+    return nil
   end
 
 end
 
-function process_segment(profile, segment)
-  local sourceraster = get_raster_source(segment.source)
-  local targetraster = get_raster_source(segment.target)
-  local sourceData = raster:interpolate(sourceraster, segment.source.lon, segment.source.lat)
-  local targetData = raster:interpolate(targetraster, segment.target.lon, segment.target.lat)
-  local invalid = sourceData.invalid_data()
-  local scaled_weight = segment.weight
-  local scaled_duration = segment.duration
-
-  if sourceData.datum ~= invalid and targetData.datum ~= invalid then
-    local slope = math.abs(sourceData.datum - targetData.datum) / segment.distance
-
-    scaled_weight = scaled_weight / (1 - (slope * 5))
-    scaled_duration = scaled_duration / (1 - (slope * 5))
+function get_hill_aversion(slope)
+  if slope > 0.25 then
+    return 5
+  elseif slope < 0.05 then
+    return 1
+  else
+    return 1+(slope - 0.05)*20 --sliding scale of 1-5 for 0.05 to 0.25 respectively
   end
-  segment.weight = scaled_weight
-  segment.duration = scaled_duration
+end
+
+function get_climb_penalty(climb)
+  return climb * 50
+end
+
+function process_segment(profile, segment)
+  local sourceraster = get_raster_source(profile,segment.source)
+  local targetraster = get_raster_source(profile,segment.target)
+  if sourceraster ~= nil and targetraster ~= nil then
+    local sourceData = raster:interpolate(sourceraster, segment.source.lon, segment.source.lat)
+    local targetData = raster:interpolate(targetraster, segment.target.lon, segment.target.lat)
+    local invalid = sourceData.invalid_data()
+    local scaled_weight = segment.weight
+    local scaled_duration = segment.duration
+
+    if sourceData.datum ~= invalid and targetData.datum ~= invalid then
+      local slope = math.abs(sourceData.datum - targetData.datum) / segment.distance -- avoid steepness whether up or down
+
+      local hillaversion = get_hill_aversion(slope)
+      scaled_weight = scaled_weight * hillaversion 
+      if targetData.datum > sourceData.datum then --add a duration penalty for each 100m gained
+        scaled_duration = scaled_duration + get_climb_penalty(targetData.datum - sourceData.datum) 
+      end 
+    end
+    segment.weight = scaled_weight
+    segment.duration = scaled_duration
+  end
 end
 
 return {
