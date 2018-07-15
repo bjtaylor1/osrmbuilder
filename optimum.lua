@@ -34,6 +34,7 @@ function setup()
       highway_change_penalty        = 60, --it is not worth turning off a highway onto a residential to avoid one traffic light.
                                                 -- ...but it might be worth it to avoid two or more!
       onto_primary_penalty          = 750, -- test 'off and on again' phenonenon on A9 (Golspie/Brora/Helmsdale/Dunbeath)
+      static_turn_cost              = 0,  -- extra penalty for every turn. abstract way of favouring rural routes.
       force_split_edges = true,
       process_call_tagless_node = false
     },
@@ -785,6 +786,8 @@ function process_turn(profile, turn)
 
   end
 
+  turn.weight = turn.weight + profile.properties.static_turn_cost
+
 end
 
 function get_raster_source(profile,pos)
@@ -826,13 +829,15 @@ function get_raster_source(profile,pos)
 end
 
 function get_hill_aversion(slope)
-  if slope > 0.25 then
-    return 5
-  elseif slope < 0.05 then
-    return 1
-  else
-    return 1+(slope - 0.05)*20 --sliding scale of 1-5 for 0.05 to 0.25 respectively
+  if slope > 0.35 then
+    slope = 0.35
   end
+
+  if slope <= 0.10 then
+    return 1
+  end
+
+  return 1+(slope - 0.10)*30 --sliding scale of 1-5 for 0.10 to 0.35 respectively
 end
 
 function get_climb_penalty(climb)
@@ -857,6 +862,7 @@ function process_segment(profile, segment)
       if targetData.datum > sourceData.datum then --add a duration penalty for each 100m gained
         scaled_duration = scaled_duration + get_climb_penalty(targetData.datum - sourceData.datum) 
       end 
+
     end
     segment.weight = scaled_weight
     segment.duration = scaled_duration
