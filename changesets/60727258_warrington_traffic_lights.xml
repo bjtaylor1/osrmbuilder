@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osmChange version="0.6" generator="CGImap 0.6.0 (15406 thorn-01.openstreetmap.org)" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">
+ <modify>
+  <node id="1667610470" visible="true" version="4" changeset="60727258" timestamp="2018-07-15T08:32:29Z" user="bentaylor" uid="538375" lat="53.3859198" lon="-2.5914201">
+   <tag k="highway" v="traffic_signals"/>
+   <tag k="traffic_signals" v="signal"/>
+  </node>
+ </modify>
+ <modify>
+  <node id="1667610478" visible="true" version="3" changeset="60727258" timestamp="2018-07-15T08:32:30Z" user="bentaylor" uid="538375" lat="53.3860410" lon="-2.5914412"/>
+ </modify>
+ <modify>
+  <node id="1667610476" visible="true" version="4" changeset="60727258" timestamp="2018-07-15T08:32:30Z" user="bentaylor" uid="538375" lat="53.3860228" lon="-2.5915362"/>
+ </modify>
+</osmChange>
