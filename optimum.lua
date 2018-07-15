@@ -9,6 +9,9 @@ find_access_tag = require("lib/access").find_access_tag
 limit = require("lib/maxspeed").limit
 require("lualib/surfacewhitelist")
 
+lua_sql = require("luasql.postgres")
+sql_env = assert(lua_sql.postgres())
+sql_con = assert(sql_env:connect("osm"))
 
 function setup()
 
@@ -669,6 +672,9 @@ function process_way(profile, way, result)
     -- new handler to reject anything that isn't a surface we like, including unknown surfaces.
     unknown_surface_handler,
 
+    -- new handler to query postgis for built up area
+    builtup_area_handler,
+
     -- handle turn lanes and road classification, used for guidance
     WayHandlers.classification,
 
@@ -692,6 +698,30 @@ function process_way(profile, way, result)
   }
 
   WayHandlers.run(profile, way, result, data, handlers)
+
+ -- result.access_turn_classification = way:id()
+
+  if way:id() == 154191473 then
+    io.write("found 7, speed = "..tostring(result.forward_speed)..", "..tostring(result.backward_speed).."\n")
+    result.access_turn_classification = 7 
+  elseif way:id() == 154191469 then
+    result.access_turn_classification = 2
+    io.write("found 2\n")
+  elseif way:id() == 31959375 then
+    result.access_turn_classification = 3
+    io.write("found 3\n")
+  elseif way:id() == 27865733 then
+    result.access_turn_classification = 4
+    io.write("found 4\n")
+  elseif way:id() == 154191480 then
+    result.access_turn_classification = 5
+    io.write("found 5\n")
+  elseif way:id() == 298219464 then
+    result.access_turn_classification = 6
+    io.write("found 6\n")
+
+  end
+
 end
 
 function unknown_surface_handler(profile,way,result,data)
@@ -710,7 +740,29 @@ function unknown_surface_handler(profile,way,result,data)
 
 end
 
+function builtup_area_handler(profile, way, result, data)
+  local sql_query = " " ..
+    "SELECT SUM(SQRT(area.area)) AS val " ..
+    "FROM osm_roads_t way " ..
+    "LEFT JOIN osm_landusages area ON ST_DWithin(way.geometry, area.geometry, 100) " ..
+    "WHERE area.type IN ('industrial') AND way.osm_id=" .. way:id() .. " " ..
+    "GROUP BY way.id"
+
+  local cursor = assert( sql_con:execute(sql_query) )   -- execute querty
+  local row = cursor:fetch( {}, "a" )                   -- fetch first (and only) row
+  if row then
+    local val = tonumber(row.val)                       -- read 'val' from row
+    if val > 10 then
+      -- reduce speed by amount of industry close by
+
+      result.forward_speed = result.forward_speed / math.log10( val )
+    end
+  end
+  cursor:close()
+end 
+
 function process_turn(profile, turn)
+
   -- compute turn penalty as angle^2, with a left/right bias
   local normalized_angle = turn.angle / 90.0
   if normalized_angle >= 0.0 then
@@ -748,8 +800,12 @@ function process_turn(profile, turn)
   if turn.source_number_of_lanes > 2 and turn.angle > 30 and not turn.has_traffic_light then
     -- e.g. 55.966113,-3.318558 (A90 in Edinburgh)
     turn.weight = turn.weight + 2000
+
   end
-    
+
+  if turn.target_access_turn_classification == 3 then
+    io.write("\nsource access = "..tostring(turn.source_access_turn_classification)..", target access = "..tostring(turn.target_access_turn_classification)..", angle = "..tostring(turn.angle)..", number of roads = "..tostring(turn.number_of_roads)..", source lanes = "..tostring(turn.source_number_of_lanes)..", has traffic lights = "..tostring(turn.has_traffic_light)..", source is link = "..tostring(turn.source_is_link)..", source speed = "..tostring(turn.source_speed)..", weight = "..tostring(turn.weight)..", duration = "..tostring(turn.duration).."\n")
+  end
 end
 
 function get_raster_source(profile,pos)
