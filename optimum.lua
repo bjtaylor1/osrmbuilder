@@ -358,6 +358,8 @@ function handle_bicycle_tags(profile,way,result,data)
   data.foot_backward = way:get_value_by_key("foot:backward")
   data.bicycle = way:get_value_by_key("bicycle")
 
+  
+
   speed_handler(profile,way,result,data)
 
   oneway_handler(profile,way,result,data)
@@ -699,29 +701,6 @@ function process_way(profile, way, result)
 
   WayHandlers.run(profile, way, result, data, handlers)
 
- -- result.access_turn_classification = way:id()
-
-  if way:id() == 154191473 then
-    io.write("found 7, speed = "..tostring(result.forward_speed)..", "..tostring(result.backward_speed).."\n")
-    result.access_turn_classification = 7 
-  elseif way:id() == 154191469 then
-    result.access_turn_classification = 2
-    io.write("found 2\n")
-  elseif way:id() == 31959375 then
-    result.access_turn_classification = 3
-    io.write("found 3\n")
-  elseif way:id() == 27865733 then
-    result.access_turn_classification = 4
-    io.write("found 4\n")
-  elseif way:id() == 154191480 then
-    result.access_turn_classification = 5
-    io.write("found 5\n")
-  elseif way:id() == 298219464 then
-    result.access_turn_classification = 6
-    io.write("found 6\n")
-
-  end
-
 end
 
 function unknown_surface_handler(profile,way,result,data)
@@ -748,14 +727,17 @@ function builtup_area_handler(profile, way, result, data)
     "WHERE area.type IN ('industrial') AND way.osm_id=" .. way:id() .. " " ..
     "GROUP BY way.id"
 
-  local cursor = assert( sql_con:execute(sql_query) )   -- execute querty
-  local row = cursor:fetch( {}, "a" )                   -- fetch first (and only) row
+  local cursor = assert( sql_con:execute(sql_query) )
+  local builtup_sensitivity = 10 -- minimum 1
+  local row = cursor:fetch( {}, "a" )
   if row then
-    local val = tonumber(row.val)                       -- read 'val' from row
+    local val = tonumber(row.val)
     if val > 10 then
-      -- reduce speed by amount of industry close by
+      local factor = ((builtup_sensitivity*math.log10( val )) -(builtup_sensitivity-1) )
 
-      result.forward_speed = result.forward_speed / math.log10( val )
+      result.forward_rate = result.forward_speed / factor
+      result.backward_rate = result.backward_speed / factor 
+--      io.write("way "..tostring(way:id()).." forward speed = "..tostring(result.forward_speed)..", forward_rate = "..tostring(result.forward_rate).."\n")
     end
   end
   cursor:close()
@@ -791,7 +773,7 @@ function process_turn(profile, turn)
       turn.weight = turn.weight + profile.properties.highway_change_penalty
     end
 
-    if turn.source_highway_turn_classification > 1 and turn.target_highway_turn_classification <= 1 then
+    if turn.source_highway_turn_classification > 1 and turn.target_highway_turn_classification == 1 then
       turn.weight = turn.weight + profile.properties.onto_primary_penalty --if we're turning onto a primary/trunk from a non-primary/trunk,incur a penalty.
                 -- this is to avoid the coming off a main road temporarily and then back onto it again phenomenon.
     end
