@@ -675,7 +675,7 @@ function process_way(profile, way, result)
     unknown_surface_handler,
 
     -- new handler to query postgis for built up area
-    builtup_area_handler,
+    --builtup_area_handler,
 
     -- handle turn lanes and road classification, used for guidance
     WayHandlers.classification,
@@ -785,9 +785,6 @@ function process_turn(profile, turn)
 
   end
 
-  if turn.target_access_turn_classification == 3 then
-    io.write("\nsource access = "..tostring(turn.source_access_turn_classification)..", target access = "..tostring(turn.target_access_turn_classification)..", angle = "..tostring(turn.angle)..", number of roads = "..tostring(turn.number_of_roads)..", source lanes = "..tostring(turn.source_number_of_lanes)..", has traffic lights = "..tostring(turn.has_traffic_light)..", source is link = "..tostring(turn.source_is_link)..", source speed = "..tostring(turn.source_speed)..", weight = "..tostring(turn.weight)..", duration = "..tostring(turn.duration).."\n")
-  end
 end
 
 function get_raster_source(profile,pos)
