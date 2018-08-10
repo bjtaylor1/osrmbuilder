@@ -126,11 +126,11 @@ function setup()
     -- reduce the driving speed by 30% for unsafe roads
     -- only used for cyclability metric
     unsafe_highway_list = {
-      trunk = 0.5,
-      primary = 0.6,
+      trunk = 0.8,
+      primary = 0.8,
 --      secondary = 0.65,
 --      tertiary = 0.8,
-      primary_link = 0.6
+      primary_link = 0.8
 --      secondary_link = 0.65,
 --      tertiary_link = 0.8,
     },
@@ -154,6 +154,7 @@ function setup()
       road = default_speed,
       track = default_speed,
       path = default_speed
+--      service = default_speed
     },
 
 
@@ -171,6 +172,7 @@ function setup()
         unclassified    = true,
         residential     = true,
         living_street   = true
+--        service = true
     },
 
     pedestrian_speeds = {
@@ -206,7 +208,7 @@ function setup()
     },
 
     bridge_speeds = {
-      movable = 5
+    --  movable = default_speed
     },
 
     surface_speeds = {
@@ -312,6 +314,10 @@ function process_node(profile, node, result)
   if tag and "traffic_signals" == tag then
     result.traffic_lights = true
   end
+
+--  if result.barrier then
+--    io.write(tostring(node:id())..": is a barrier!\n")
+--  end
 end
 
 function handle_bicycle_tags(profile,way,result,data)
@@ -359,18 +365,28 @@ function handle_bicycle_tags(profile,way,result,data)
   data.foot_backward = way:get_value_by_key("foot:backward")
   data.bicycle = way:get_value_by_key("bicycle")
 
-  
+ --debug_way(way,result,data,"A") 
 
   speed_handler(profile,way,result,data)
 
+--debug_way(way,result,data,"B")
+
   oneway_handler(profile,way,result,data)
+
+--debug_way(way,result,data,"C")
 
   cycleway_handler(profile,way,result,data)
 
+--debug_way(way,result,data,"D")
+
   safety_handler(profile,way,result,data)
+
+--debug_way(way,result,data,"E")
 
   -- maxspeed
   limit( result, data.maxspeed, data.maxspeed_forward, data.maxspeed_backward )
+
+--debug_way(way,result,data,"F")
 
   -- not routable if no speed assigned
   -- this avoid assertions in debug builds
@@ -380,32 +396,23 @@ function handle_bicycle_tags(profile,way,result,data)
   if result.backward_speed <= 0 and result.duration <= 0 then
     result.backward_mode = mode.inaccessible
   end
+
+  --debug_way(way,result,data,"7")
 end
 
 function debug_way(way, result, data, msg)
---  local id = way:id()
---  if id == 28954758 or id == 28954730 then
---    local access = data.access or '(nil)'
---    io.write(tostring(id)..": "..msg..", forward_speed = "..result.forward_speed..", backward_speed = "..result.backward_speed..", access = "..access.."\n")
---  end 
+  local id = way:id()
+  if id == 40976327 or id == 43849174 or id == 4049888 then
+    local access = data.access or '(nil)'
+    io.write(tostring(id)..": "..msg..", forward_speed = "..result.forward_speed..", backward_speed = "..result.backward_speed..", access = "..access..", duration="..tostring(result.duration).."\n")
+  end 
 end
 
 function speed_handler(profile,way,result,data)
 
   data.way_type_allows_pushing = false
 
-  -- speed
-  local bridge_speed = profile.bridge_speeds[data.bridge]
-  if (bridge_speed and bridge_speed > 0) then
-    data.highway = data.bridge
-    if data.duration and durationIsValid(data.duration) then
-      result.duration = math.max( parseDuration(data.duration), 1 )
-    end
-    result.forward_speed = bridge_speed
-    result.backward_speed = bridge_speed
-    data.way_type_allows_pushing = true
-    debug_way(way,result,data, "1")
-  elseif profile.route_speeds[data.route] then
+  if profile.route_speeds[data.route] then
     -- ferries (doesn't cover routes tagged using relations)
     result.forward_mode = mode.ferry
     result.backward_mode = mode.ferry
@@ -415,44 +422,44 @@ function speed_handler(profile,way,result,data)
        result.forward_speed = profile.route_speeds[data.route]
        result.backward_speed = profile.route_speeds[data.route]
     end
-    debug_way(way,result,data, "2")
+    --debug_way(way,result,data, "2")
   -- railway platforms (old tagging scheme)
   elseif data.railway and profile.platform_speeds[data.railway] then
     result.forward_speed = profile.platform_speeds[data.railway]
     result.backward_speed = profile.platform_speeds[data.railway]
     data.way_type_allows_pushing = true
-    debug_way(way,result,data, "3")
+    --debug_way(way,result,data, "3")
   -- public_transport platforms (new tagging platform)
   elseif data.public_transport and profile.platform_speeds[data.public_transport] then
     result.forward_speed = profile.platform_speeds[data.public_transport]
     result.backward_speed = profile.platform_speeds[data.public_transport]
     data.way_type_allows_pushing = true
-    debug_way(way,result,data, "4")
+    --debug_way(way,result,data, "4")
   -- railways
   elseif profile.use_public_transport and data.railway and profile.railway_speeds[data.railway] and profile.access_tag_whitelist[data.access] then
     result.forward_mode = mode.train
     result.backward_mode = mode.train
     result.forward_speed = profile.railway_speeds[data.railway]
     result.backward_speed = profile.railway_speeds[data.railway]
-    debug_way(way,result,data, "5")
+    --debug_way(way,result,data, "5")
   elseif data.amenity and profile.amenity_speeds[data.amenity] then
     -- parking areas
     result.forward_speed = profile.amenity_speeds[data.amenity]
     result.backward_speed = profile.amenity_speeds[data.amenity]
     data.way_type_allows_pushing = true
-    debug_way(way,result,data, "6")
+    --debug_way(way,result,data, "6")
   elseif profile.bicycle_speeds[data.highway] then
     -- regular ways
     result.forward_speed = profile.bicycle_speeds[data.highway]
     result.backward_speed = profile.bicycle_speeds[data.highway]
     data.way_type_allows_pushing = true
-    debug_way(way,result,data, "7")
+    --debug_way(way,result,data, "7")
   elseif data.access and profile.access_tag_whitelist[data.access]  then
     -- unknown way, but valid access tag
     result.forward_speed = profile.default_speed
     result.backward_speed = profile.default_speed
     data.way_type_allows_pushing = true
-    debug_way(way,result,data, "8")
+    --debug_way(way,result,data, "8")
   end
 end
 
@@ -702,6 +709,11 @@ function process_way(profile, way, result)
 
   WayHandlers.run(profile, way, result, data, handlers)
 
+debug_way(way,result,data,"END")
+if result.forward_mode == mode.inaccessible or result.backward_mode == mode.inaccessible then
+  io.write(tostring(way:id()).." is inaccessible!\n!")
+end
+
 end
 
 function unknown_surface_handler(profile,way,result,data)
@@ -837,11 +849,12 @@ function get_hill_aversion(slope)
     return 1
   end
 
-  return 1+(slope - 0.10)*30 --sliding scale of 1-5 for 0.10 to 0.35 respectively
+  return 1+(slope - 0.10)*100 --sliding scale of 1-5 for 0.10 to 0.35 respectively
+
 end
 
 function get_climb_penalty(climb)
-  return climb * 50
+  return climb * 100
 end
 
 function process_segment(profile, segment)
