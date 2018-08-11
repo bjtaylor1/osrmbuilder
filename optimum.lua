@@ -858,8 +858,8 @@ function get_hill_aversion(slope, elevationgain)
 
   if slope > min_grad_for_aversion then
     local factor = slope - min_grad_for_aversion
-    local factor2 = factor * factor
-    aversion = aversion + (factor2 * slopeaversion)
+--    local factor2 = factor * factor
+    aversion = aversion + (factor * slopeaversion)
   end
 
   if elevationgain > 0 then
