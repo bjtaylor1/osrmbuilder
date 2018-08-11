@@ -710,9 +710,9 @@ function process_way(profile, way, result)
   WayHandlers.run(profile, way, result, data, handlers)
 
 debug_way(way,result,data,"END")
-if result.forward_mode == mode.inaccessible or result.backward_mode == mode.inaccessible then
-  io.write(tostring(way:id()).." is inaccessible!\n!")
-end
+--if result.forward_mode == mode.inaccessible or result.backward_mode == mode.inaccessible then
+--  io.write(tostring(way:id()).." is inaccessible!\n!")
+--end
 
 end
 
@@ -840,21 +840,34 @@ function get_raster_source(profile,pos)
 
 end
 
-function get_hill_aversion(slope)
-  if slope > 0.35 then
-    slope = 0.35
+maxaversion = nil
+minaversion = nil
+
+function get_hill_aversion(slope, elevationgain)
+  local min_grad_for_aversion = 0.15
+  local max_grad = 0.35
+
+  if slope > max_grad then
+    slope = max_grad
   end
 
-  if slope <= 0.10 then
-    return 1
+  local aversion = 1.0
+
+  local slopeaversion = 2.0 --applied to steep gradients, whether down or up
+  local climbaversion = 2.0 --200 --applied to absolute height gain
+
+  if slope > min_grad_for_aversion then
+    local factor = slope - min_grad_for_aversion
+    local factor2 = factor * factor
+    aversion = aversion + (factor2 * slopeaversion)
   end
 
-  return 1+(slope - 0.10)*100 --sliding scale of 1-5 for 0.10 to 0.35 respectively
+  if elevationgain > 0 then
+    aversion = aversion + (elevationgain * climbaversion)
+  end
 
-end
-
-function get_climb_penalty(climb)
-  return climb * 100
+  local correctaversion = 1.0 / (1.0 - (slope * 5.0))
+  return aversion
 end
 
 function process_segment(profile, segment)
@@ -868,17 +881,38 @@ function process_segment(profile, segment)
     local scaled_duration = segment.duration
 
     if sourceData.datum ~= invalid and targetData.datum ~= invalid then
-      local slope = math.abs(sourceData.datum - targetData.datum) / segment.distance -- avoid steepness whether up or down
+      local elevationgain = targetData.datum - sourceData.datum
+      --local slope = math.abs(elevationgain) / segment.distance -- avoid steepness whether up or down
+      local slope = (targetData.datum - sourceData.datum) / segment.distance
 
-      local hillaversion = get_hill_aversion(slope)
-      scaled_weight = scaled_weight * hillaversion 
-      if targetData.datum > sourceData.datum then --add a duration penalty for each 100m gained
-        scaled_duration = scaled_duration + get_climb_penalty(targetData.datum - sourceData.datum) 
-      end 
+      local hillaversion = get_hill_aversion(slope, elevationgain)
+      if maxaversion == nil or hillaversion > maxaversion then
+        maxaversion = hillaversion
+        io.write("maxaversion = "..tostring(maxaversion).."\n")
+      end
 
+      if minaversion == nil or hillaversion < minaversion then
+        minaversion = hillaversion
+        io.write("minaversion = "..tostring(minaversion).."\n")
+      end
+
+      if hillaversion == 0 or hillaversion == nil then
+        io.write("aversion is 0 or nil!\n")
+      end
+
+      --if segment.target.lat > 57.124556 then
+      --  hillaversion = hillaversion + 1000
+      --end
+      --io.write("hillaversion = "..tostring(hillaversion).."\n")
+      scaled_weight = scaled_weight * hillaversion
+      scaled_duration = scaled_duration * hillaversion
+
+      --scaled_weight = scaled_weight / (1.0 - (slope * 5.0))
+      --scaled_duration = scaled_duration / (1.0 - (slope * 5.0)) 
     end
     segment.weight = scaled_weight
     segment.duration = scaled_duration
+
   end
 end
 
