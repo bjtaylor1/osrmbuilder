@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
-for routetype in optimum ; do
+
+export OSRM_RASTER_SOURCE=`pwd`/rasters/
+for routetype in shortest optimum; do
   echo Preparing $routetype
 	rm -rf $routetype
 	mkdir $routetype

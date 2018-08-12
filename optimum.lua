@@ -15,7 +15,7 @@ sql_con = assert(sql_env:connect("osm"))
 
 function setup()
 
-  local raster_path = '/home/ben/rasters/'
+  local raster_path = os.getenv("OSRM_RASTER_SOURCE") 
 
   local default_speed = 15
   local walking_speed = 4
@@ -207,9 +207,9 @@ function setup()
       ferry = 5
     },
 
-    bridge_speeds = {
+    --bridge_speeds = {
     --  movable = default_speed
-    },
+    --},
 
     surface_speeds = {
       asphalt = default_speed,
@@ -328,15 +328,15 @@ function handle_bicycle_tags(profile,way,result,data)
   data.railway = way:get_value_by_key("railway")
   data.amenity = way:get_value_by_key("amenity")
   data.public_transport = way:get_value_by_key("public_transport")
-  data.bridge = way:get_value_by_key("bridge")
+--  data.bridge = way:get_value_by_key("bridge")
 
   if (not data.highway or data.highway == '') and
   (not data.route or data.route == '') and
   (not profile.use_public_transport or not data.railway or data.railway=='') and
   (not data.amenity or data.amenity=='') and
   (not data.man_made or data.man_made=='') and
-  (not data.public_transport or data.public_transport=='') and
-  (not data.bridge or data.bridge=='')
+  (not data.public_transport or data.public_transport=='') 
+--  (not data.bridge or data.bridge=='')
   then
     return false
   end
@@ -402,9 +402,9 @@ end
 
 function debug_way(way, result, data, msg)
   local id = way:id()
-  if id == 40976327 or id == 43849174 or id == 4049888 then
+  if id == 22741660 then
     local access = data.access or '(nil)'
-    io.write(tostring(id)..": "..msg..", forward_speed = "..result.forward_speed..", backward_speed = "..result.backward_speed..", access = "..access..", duration="..tostring(result.duration).."\n")
+    io.write(tostring(id)..": "..msg..", forward_speed = "..result.forward_speed..", backward_speed = "..result.backward_speed..", access = "..access..", duration="..tostring(result.duration)..", weight = "..tostring(result.weight).."\n")
   end 
 end
 
@@ -634,7 +634,7 @@ function process_way(profile, way, result)
     railway = nil,
     amenity = nil,
     public_transport = nil,
-    bridge = nil,
+    --bridge = nil,
 
     access = nil,
 
@@ -844,30 +844,25 @@ maxaversion = nil
 minaversion = nil
 
 function get_hill_aversion(slope, elevationgain)
-  local min_grad_for_aversion = 0.15
-  local max_grad = 0.35
+  local min_grad_for_aversion = 0.0
+--  local max_grad = 0.35
 
-  if slope > max_grad then
-    slope = max_grad
+--  if slope > max_grad then
+--    slope = max_grad
+--  end
+
+  if slope < min_grad_for_aversion then
+    slope = min_grad_for_aversion
   end
 
-  local aversion = 1.0
+  local aversion = math.abs(1.0 / (1.0 - (slope * 5.0)))
 
-  local slopeaversion = 2.0 --applied to steep gradients, whether down or up
-  local climbaversion = 2.0 --200 --applied to absolute height gain
-
-  if slope > min_grad_for_aversion then
-    local factor = slope - min_grad_for_aversion
---    local factor2 = factor * factor
-    aversion = aversion + (factor * slopeaversion)
+  if slope < 0.1 and elevationgain < 0 then
+    aversion = 0.8 --slight benefit for gentle downhills
   end
 
-  if elevationgain > 0 then
-    aversion = aversion + (elevationgain * climbaversion)
-  end
-
-  local correctaversion = 1.0 / (1.0 - (slope * 5.0))
   return aversion
+  --return aversion
 end
 
 function process_segment(profile, segment)
