@@ -9,10 +9,6 @@ find_access_tag = require("lib/access").find_access_tag
 limit = require("lib/maxspeed").limit
 require("lualib/surfacewhitelist")
 
-lua_sql = require("luasql.postgres")
-sql_env = assert(lua_sql.postgres())
-sql_con = assert(sql_env:connect("osm"))
-
 function setup()
 
   local raster_path = os.getenv("OSRM_RASTER_SOURCE") 
@@ -401,11 +397,11 @@ function handle_bicycle_tags(profile,way,result,data)
 end
 
 function debug_way(way, result, data, msg)
-  local id = way:id()
-  if id == 22741660 then
-    local access = data.access or '(nil)'
-    io.write(tostring(id)..": "..msg..", forward_speed = "..result.forward_speed..", backward_speed = "..result.backward_speed..", access = "..access..", duration="..tostring(result.duration)..", weight = "..tostring(result.weight).."\n")
-  end 
+--  local id = way:id()
+--  if id == 22741660 then
+--    local access = data.access or '(nil)'
+--    io.write(tostring(id)..": "..msg..", forward_speed = "..result.forward_speed..", backward_speed = "..result.backward_speed..", access = "..access..", duration="..tostring(result.duration)..", weight = "..tostring(result.weight).."\n")
+--  end 
 end
 
 function speed_handler(profile,way,result,data)
