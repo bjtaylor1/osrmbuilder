@@ -558,7 +558,7 @@ function safety_handler(profile,way,result,data)
       result.backward_rate = result.backward_speed / 3.6 
     end
     if result.duration > 0 then
-      result.weight = result.duration / forward_penalty
+      result.weight = result.duration
     end
 
   end
