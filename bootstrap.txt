@@ -23,9 +23,9 @@ permissions:
 chown root:ubuntu /disk1 /disk2 /results
 chmod 775 /disk1 /disk2 /results
 
-sudo apt-get install unzip build-essential git cmake pkg-config libprotoc-dev libprotobuf8 \
+sudo apt-get install unzip build-essential git cmake pkg-config libprotoc-dev libprotobuf9v5 \
 protobuf-compiler libprotobuf-dev libosmpbf-dev libpng12-dev \
-libbz2-dev libstxxl-dev libstxxl-doc libstxxl1 libxml2-dev \
+libbz2-dev libstxxl-dev libstxxl-doc libstxxl1v5 libxml2-dev \
 libzip-dev libboost-all-dev lua5.1 liblua5.1-0-dev libluabind-dev libluajit-5.1-dev libtbb-dev \
 postgresql postgresql-contrib postgis postgresql-9.5-postgis-2.2 osmosis lua-sql-postgres lua-sql-postgres-dev osmctools
 
@@ -44,7 +44,7 @@ for each disk available (number is in MB)
 sudo aptitude install build-essential python-dev protobuf-compiler \
                       libprotobuf-dev libtokyocabinet-dev python-psycopg2 \
                       libgeos-c1v5 \
-libgdal1-dev libspatialindex-dev python-pip
+libgdal1-dev python-pip libspatialindex-dev
 sudo pip install imposm
 pip install rtree
 imposm --read --write --deploy-production-tables --optimize great-britain-latest.osm.pbf -d osm -U osm --overwrite-cache
