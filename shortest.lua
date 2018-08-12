@@ -9,10 +9,6 @@ find_access_tag = require("lib/access").find_access_tag
 limit = require("lib/maxspeed").limit
 require("lualib/surfacewhitelist")
 
-lua_sql = require("luasql.postgres")
-sql_env = assert(lua_sql.postgres())
-sql_con = assert(sql_env:connect("osm"))
-
 function setup()
 
 --  local raster_path = os.getenv("OSRM_RASTER_SOURCE") 
