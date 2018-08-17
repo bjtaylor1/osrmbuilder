@@ -1,11 +1,8 @@
 #!/bin/bash
 set -e
-cd ..
-rm -rf Project-OSRM
-git clone https://github.com/Project-OSRM/osrm-backend Project-OSRM
 
-cd Project-OSRM
-
+cd ../osrm-backend
+git pull
 rm -f CMakeCache.txt
 rm -rf build
 mkdir build

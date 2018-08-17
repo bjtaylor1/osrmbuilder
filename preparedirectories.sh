@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-for routetype in auk touristb; do
+export OSRM_RASTER_SOURCE=`pwd`/rasters/
+for routetype in shortest optimum; do
   echo Preparing $routetype
 	rm -rf $routetype
 	mkdir $routetype
@@ -11,7 +12,7 @@ for routetype in auk touristb; do
   cd $routetype
   ln -s ../countries.osm.pbf countries.osm.pbf
   ./osrm-extract countries.osm.pbf -p $routetype.lua
-  ./osrm-contract countries.osrm # -p $routetype.lua
+  ./osrm-contract countries.osrm  
   cd ..
 done
 
