@@ -1,7 +1,7 @@
 create or replace function staggered ()
 returns void
 as $$
-declare cursor thecursor for
+declare thecursor cursor for
 select wn.way_id as way_id,
     w2.ref,
     count(*) as count
@@ -17,7 +17,18 @@ w.ref != w2.ref
 group by wn.way_id, w.junction, w2.ref
 having count(*) > 1;
 
-begin
+declare way_id int;
+declare ref varchar(255);
 
+begin
+	open thecursor;
+	loop
+		fetch thecursor into way_id, ref;
+		exit when not found;
+		raise notice  'way_id = %', way_id;
+		raise notice 'ref = %', ref;
+		exit;
+	end loop;
+	close thecursor;
 end; $$
 language plpgsql;

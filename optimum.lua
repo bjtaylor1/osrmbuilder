@@ -19,7 +19,7 @@ function setup()
   return {
     properties = {
       u_turn_penalty                = 20,
-      traffic_light_penalty         = 40,
+      traffic_light_penalty         = 250,
       weight_name                   = 'cyclability',
 --      weight_name                   = 'duration',
       process_call_tagless_node     = false,
@@ -29,8 +29,8 @@ function setup()
       mode_change_penalty           = 30,
       highway_change_penalty        = 60, --it is not worth turning off a highway onto a residential to avoid one traffic light.
                                                 -- ...but it might be worth it to avoid two or more!
-      onto_primary_penalty          = 750, -- test 'off and on again' phenonenon on A9 (Golspie/Brora/Helmsdale/Dunbeath)
-      static_turn_cost              = 0,  -- extra penalty for every turn. abstract way of favouring rural routes.
+      onto_primary_penalty          = 250, -- test 'off and on again' phenonenon on A9 (Golspie/Brora/Helmsdale/Dunbeath)
+      static_turn_cost              = 250,  -- extra penalty for every turn. abstract way of favouring rural routes.
       force_split_edges = true,
       process_call_tagless_node = false
     },
