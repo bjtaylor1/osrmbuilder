@@ -4,8 +4,8 @@ as $$
 declare	thecursor cursor for select way_id, ref from staggeredjunctions;-- where way_id = 173688433;
 v_way_id int;
 v_ref varchar(255);
-nodeid1 int;
-nodeid2 int;
+nodeid1 bigint;
+nodeid2 bigint;
 geom1 geometry;
 geom2 geometry;
 newwayline geometry;
@@ -14,7 +14,9 @@ newwaytags hstore;
 nodescursor refcursor;
 distance float;
 newwayid int;
+
 begin
+	delete from ways where source_way_id is not null;
 	open thecursor;
 	loop
 		fetch thecursor into v_way_id, v_ref;
@@ -54,7 +56,6 @@ begin
 
 			end if;
 		end if;
-		exit;
 	end loop;
 	close thecursor;
 end; $$
