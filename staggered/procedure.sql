@@ -14,8 +14,12 @@ newwaytags hstore;
 nodescursor refcursor;
 distance float;
 newwayid int;
+nodecount int;
 
 begin
+	drop table if exists staggerednodes;
+	create temporary table staggerednodes(id bigint, geom geometry);
+
 	delete from ways where source_way_id is not null;
 	open thecursor;
 	loop
@@ -23,17 +27,18 @@ begin
 
 		exit when not found;
 
-
-		drop table if exists staggerednodes;
-
-		create temp table staggerednodes as 
-		select distinct n.id, geom
-		from nodes n
-		join way_nodes wn on n.id = wn.node_id
-		join way_nodes wn2 on n.id = wn.node_id
-		join ways w2 on wn2.way_id = w2.id
-		where wn.way_id = v_way_id
-		and w2.ref = v_ref;
+		truncate table staggerednodes;
+		-- we want exactly two nodes, BOTH of which...
+		insert into staggerednodes(id, geom)
+		select n.id, geom
+		    from nodes n
+		    where exists (select * from way_nodes wn1 -- ... intersect with the target way (the 'main' road)...
+			where wn1.way_id = v_way_id 
+			and wn1.node_id = n.id)
+		    and exists (select * from way_nodes wn2 -- ... and also intersect with the ref (the 'crossing' road).
+		        join ways w on wn2.way_id = w.id 
+		        where w.ref = v_ref 
+		        and wn2.node_id = n.id);
 
 		if (select count(*) from staggerednodes) = 2 then
 			open nodescursor for select id, geom from staggerednodes;
@@ -52,7 +57,7 @@ begin
 				insert into ways(version, user_id, tstamp, changeset_id, tags, nodes, bbox, linestring, ref, junction, source_way_id, source_ref)
 				select version, user_id, tstamp, changeset_id, newwaytags, ARRAY[nodeid1, nodeid2], newwaybbox, newwayline, ref, '', v_way_id, v_ref from ways where id = v_way_id;
 
-				raise notice  'way_id = %, ref = %', v_way_id, v_ref;
+				raise notice  'way_id = %, ref = %, nodeid1 = %, nodeid2 = %', v_way_id, v_ref, nodeid1, nodeid2;
 
 			end if;
 		end if;
