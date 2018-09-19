@@ -9,7 +9,7 @@ psql -d osm -f /usr/share/doc/osmosis/examples/pgsnapshot_schema_0.6.sql
 psql -d osm -f /usr/share/doc/osmosis/examples/pgsnapshot_schema_0.6_bbox.sql
 psql -d osm -f /usr/share/doc/osmosis/examples/pgsnapshot_schema_0.6_linestring.sql
 
-osmosis --read-pbf countries.osm.pbf --log-progress --write-pgsql database=osm user=osm password=osm
+osmosis --read-pbf rawdata.osm.pbf --log-progress --write-pgsql database=osm user=osm password=osm
 
 # after import, change trunks to highway
 # they have issues with lane_count being available
@@ -21,3 +21,4 @@ psql -d osm -f staggered/process.sql
 
 psql -d osm -c "select staggered();"
 
+osmosis --read-pgsql database=osm user=osm password=osm --dataset-dump --write-pbf countries-processed.osm.pbf
