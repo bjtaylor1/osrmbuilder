@@ -1,5 +1,6 @@
 alter table ways add column ref varchar(255);
 alter table ways add column junction varchar(255);
+alter table ways add column source_way_id bigint;
 
 update ways set ref = tags->'ref';
 
