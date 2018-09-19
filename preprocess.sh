@@ -14,8 +14,9 @@ osmosis --read-pbf countries.osm.pbf --log-progress --write-pgsql database=osm u
 # after import, change trunks to highway
 # they have issues with lane_count being available
 # (see logged issue for more info)
-psql -d osm -c update ways set tags = tags || 'highway=>primary'::hstore where tags->'highway' = 'trunk'
+psql -d osm -c "update ways set tags = tags || 'highway=>primary'::hstore where tags->'highway' = 'trunk'"
 
+psql -d osm -f staggered/procedure.sql
 psql -d osm -f staggered/process.sql
 
 psql -d osm -c "select staggered();"
