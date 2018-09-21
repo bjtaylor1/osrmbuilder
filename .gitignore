@@ -1,5 +1,7 @@
+
 auk/
 touristb/
+*.bak
 *.osm.pbf
 *.osm
 *.osrm

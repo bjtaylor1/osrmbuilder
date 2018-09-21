@@ -1,4 +1,7 @@
 #/bin/bash
+set -e
+set -x
+
 dropdb --if-exists osm
 createdb osm
 
