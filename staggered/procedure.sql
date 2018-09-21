@@ -16,7 +16,9 @@ distance float;
 newwayid int;
 nodecount int;
 
+
 begin
+	newwayid = (select max(id) from ways);
 	drop table if exists staggerednodes;
 	create temporary table staggerednodes(id bigint, geom geometry);
 
@@ -54,8 +56,9 @@ begin
 				newwaytags = newwaytags || 'highway=>secondary'::hstore;
 				newwayline = ST_MakeLine(geom1, geom2);
 				newwaybbox = ST_Envelope(newwayline);
-				insert into ways(version, user_id, tstamp, changeset_id, tags, nodes, bbox, linestring, ref, junction, source_way_id)
-				select version, user_id, tstamp, changeset_id, newwaytags, ARRAY[nodeid1, nodeid2], newwaybbox, newwayline, ref, '', v_way_id from ways where id = v_way_id;
+				newwayid = newwayid + 1;
+				insert into ways(id, version, user_id, tstamp, changeset_id, tags, nodes, bbox, linestring, ref, junction, source_way_id)
+				select newwayid, version, user_id, tstamp, changeset_id, newwaytags, ARRAY[nodeid1, nodeid2], newwaybbox, newwayline, ref, '', v_way_id from ways where id = v_way_id;
 
 				raise notice  'way_id = %, ref = %, nodeid1 = %, nodeid2 = %', v_way_id, v_ref, nodeid1, nodeid2;
 
