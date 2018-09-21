@@ -30,6 +30,7 @@ where
 w.junction != 'roundabout' and
 w.highway != 'trunk_link' and
 w.highway != 'primary_link' and
+w.hidhway != '' and
 wn.way_id != wn2.way_id and
 w.ref != w2.ref
 group by wn.way_id, w.junction, w2.ref
