@@ -29,7 +29,7 @@ function setup()
       mode_change_penalty           = 30,
       highway_change_penalty        = 100, --it is not worth turning off a highway onto a residential to avoid one traffic light.
                                                 -- ...but it might be worth it to avoid two or more!
-      onto_primary_penalty          = 75, -- test 'off and on again' phenonenon on A9 (Golspie/Brora/Helmsdale/Dunbeath)
+      onto_primary_penalty          = 100, -- test 'off and on again' phenonenon on A9 (Golspie/Brora/Helmsdale/Dunbeath)
       static_turn_cost              = 0,  -- extra penalty for every turn. abstract way of favouring rural routes.
       force_split_edges = true,
       process_call_tagless_node = false
@@ -138,7 +138,7 @@ function setup()
     bicycle_speeds = {
       cycleway = default_speed,
       trunk = default_speed * (4.0/5.0), -- but there shouldn't be any trunks
-      primary = default_speed * (4.0/5.0),
+      primary = default_speed ,
       primary_link = default_speed,
       secondary = default_speed * (5.0/4.0),
       secondary_link = default_speed,
