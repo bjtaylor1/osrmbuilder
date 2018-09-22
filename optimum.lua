@@ -29,7 +29,7 @@ function setup()
       mode_change_penalty           = 30,
       highway_change_penalty        = 100, --it is not worth turning off a highway onto a residential to avoid one traffic light.
                                                 -- ...but it might be worth it to avoid two or more!
-      onto_primary_penalty          = 250, -- test 'off and on again' phenonenon on A9 (Golspie/Brora/Helmsdale/Dunbeath)
+      onto_primary_penalty          = 75, -- test 'off and on again' phenonenon on A9 (Golspie/Brora/Helmsdale/Dunbeath)
       static_turn_cost              = 0,  -- extra penalty for every turn. abstract way of favouring rural routes.
       force_split_edges = true,
       process_call_tagless_node = false
@@ -122,11 +122,11 @@ function setup()
     -- reduce the driving speed by 30% for unsafe roads
     -- only used for cyclability metric
     unsafe_highway_list = {
-      trunk = 0.8,
-      primary = 0.8,
+--      trunk = 0.80,
+--      primary = 0.80,
 --      secondary = 0.65,
 --      tertiary = 0.8,
-      primary_link = 0.8
+--      primary_link = 0.8
 --      secondary_link = 0.65,
 --      tertiary_link = 0.8,
     },
@@ -137,8 +137,8 @@ function setup()
 
     bicycle_speeds = {
       cycleway = default_speed,
-      trunk = default_speed,
-      primary = default_speed,
+      trunk = default_speed * (4.0/5.0), -- but there shouldn't be any trunks
+      primary = default_speed * (4.0/5.0),
       primary_link = default_speed,
       secondary = default_speed * (5.0/4.0),
       secondary_link = default_speed,
@@ -361,28 +361,28 @@ function handle_bicycle_tags(profile,way,result,data)
   data.foot_backward = way:get_value_by_key("foot:backward")
   data.bicycle = way:get_value_by_key("bicycle")
 
- debug_way(way,result,data,"A") 
+ --debug-way(way,result,data,"A") 
 
   speed_handler(profile,way,result,data)
 
-  debug_way(way,result,data,"B")
+  --debug-way(way,result,data,"B")
 
   oneway_handler(profile,way,result,data)
 
-  debug_way(way,result,data,"C")
+  --debug-way(way,result,data,"C")
 
   cycleway_handler(profile,way,result,data)
 
-  debug_way(way,result,data,"D")
+  --debug-way(way,result,data,"D")
 
   safety_handler(profile,way,result,data)
 
-  debug_way(way,result,data,"E")
+  --debug-way(way,result,data,"E")
 
   -- maxspeed
   limit( result, data.maxspeed, data.maxspeed_forward, data.maxspeed_backward )
 
-  debug_way(way,result,data,"F")
+  --debug-way(way,result,data,"F")
 
   -- not routable if no speed assigned
   -- this avoid assertions in debug builds
@@ -393,7 +393,7 @@ function handle_bicycle_tags(profile,way,result,data)
     result.backward_mode = mode.inaccessible
   end
 
-  debug_way(way,result,data,"G")
+  --debug-way(way,result,data,"G")
 end
 
 function debug_way(way, result, data, msg)
@@ -545,7 +545,6 @@ function safety_handler(profile,way,result,data)
     return false
   end
 
-
   -- convert duration into cyclability
   if profile.properties.weight_name == 'cyclability' then
     local safety_penalty = profile.unsafe_highway_list[data.highway] or 1.
@@ -565,10 +564,10 @@ function safety_handler(profile,way,result,data)
     local forward_penalty = 1.
     local backward_penalty = 1.
     if forward_is_unsafe then
-      forward_penalty = math.min(forward_penalty, safety_penalty)
+--      forward_penalty = math.min(forward_penalty, safety_penalty)
     end
     if backward_is_unsafe then
-       backward_penalty = math.min(backward_penalty, safety_penalty)
+--       backward_penalty = math.min(backward_penalty, safety_penalty)
     end
 
     if is_undesireable then
@@ -726,19 +725,19 @@ function custom_way_classification(profile, way, result, data)
 end
 
 function unknown_surface_handler(profile,way,result,data)
-	debug_way(way,result,data,"ush_begin")
+	--debug-way(way,result,data,"ush_begin")
   local id = way:id()
   local surface = way:get_value_by_key("surface")
   local ncn_ref = way:get_value_by_key("ncn_ref")
   if ncn_ref == "647" and surface ~= "dirt" then
     result.forward_speed = profile.default_speed
     result.backward_speed = profile.default_speed
-    debug_way(way,result,data,"ncn647")
+    --debug-way(way,result,data,"ncn647")
 
   elseif (SurfaceWhitelist.whitelist_ways_by_id[id] == true) then
     result.forward_speed = profile.default_speed
     result.backward_speed = profile.default_speed
-    debug_way(way,result,data,"whitelist")
+    --debug-way(way,result,data,"whitelist")
   else
     if not profile.is_road[data.highway] then
       if surface == nil or (profile.surface_speeds[surface] == nil or profile.surface_speeds[surface] == 0) then
@@ -747,9 +746,9 @@ function unknown_surface_handler(profile,way,result,data)
         return false
       end
     end
-    debug_way(way,result,data,"ush_else")
+    --debug-way(way,result,data,"ush_else")
   end
-	debug_way(way,result,data,"ush_end")
+	--debug-way(way,result,data,"ush_end")
 end
 
 function builtup_area_handler(profile, way, result, data)
