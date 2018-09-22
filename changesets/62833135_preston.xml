@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osmChange version="0.6" generator="CGImap 0.6.1 (1962 thorn-01.openstreetmap.org)" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">
+ <modify>
+  <way id="73830271" visible="true" version="5" changeset="62833135" timestamp="2018-09-22T18:19:43Z" user="bentaylor" uid="538375">
+   <nd ref="316848121"/>
+   <nd ref="873714379"/>
+   <nd ref="873714372"/>
+   <nd ref="873714363"/>
+   <tag k="highway" v="unclassified"/>
+   <tag k="maxspeed" v="30 mph"/>
+   <tag k="name" v="Edward Street"/>
+   <tag k="oneway" v="yes"/>
+  </way>
+ </modify>
+</osmChange>

@@ -1,6 +1,7 @@
 #/bin/bash
 
 set -e
+set -x
 echo $1
 
 if [ ! -f "$1" ]; then

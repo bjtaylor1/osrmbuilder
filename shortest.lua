@@ -11,42 +11,30 @@ require("lualib/surfacewhitelist")
 
 function setup()
 
---  local raster_path = os.getenv("OSRM_RASTER_SOURCE") 
+  local raster_path = os.getenv("OSRM_RASTER_SOURCE") 
 
   local default_speed = 15
   local walking_speed = 4
 
   return {
     properties = {
-      u_turn_penalty                = 20,
-      traffic_light_penalty         = 40,
+      u_turn_penalty                = 0,
+      traffic_light_penalty         = 0,
       weight_name                   = 'cyclability',
 --      weight_name                   = 'duration',
       process_call_tagless_node     = false,
       max_speed_for_map_matching    = 110/3.6, -- kmph -> m/s
       use_turn_restrictions         = false,
       continue_straight_at_waypoint = false,
-      mode_change_penalty           = 30,
-      highway_change_penalty        = 60, --it is not worth turning off a highway onto a residential to avoid one traffic light.
+      mode_change_penalty           = 0,
+      highway_change_penalty        = 0, --it is not worth turning off a highway onto a residential to avoid one traffic light.
                                                 -- ...but it might be worth it to avoid two or more!
-      onto_primary_penalty          = 750, -- test 'off and on again' phenonenon on A9 (Golspie/Brora/Helmsdale/Dunbeath)
+      onto_primary_penalty          = 0, -- test 'off and on again' phenonenon on A9 (Golspie/Brora/Helmsdale/Dunbeath)
       static_turn_cost              = 0,  -- extra penalty for every turn. abstract way of favouring rural routes.
       force_split_edges = true,
       process_call_tagless_node = false
     },
 
---    raster_sources = {
---        raster_35_03 = raster:load(raster_path..'srtm_35_03.asc', -10, -5, 45, 50, 6001, 6001),
---        raster_36_03 = raster:load(raster_path..'srtm_36_03.asc',  -5,  0, 45, 50, 6001, 6001),
---	raster_34_02 = raster:load(raster_path..'srtm_34_02.asc', -15,-10, 50, 55, 6001, 6001 ),
---        raster_35_02 = raster:load(raster_path..'srtm_35_02.asc', -10, -5, 50, 55, 6001, 6001),
---        raster_36_02 = raster:load(raster_path..'srtm_36_02.asc',  -5,  0, 50, 55, 6001, 6001),
---        raster_37_02 = raster:load(raster_path..'srtm_37_02.asc',   0,  5, 50, 55, 6001, 6001),
---        raster_34_01 = raster:load(raster_path..'srtm_34_01.asc', -15, -10,55, 60, 6001, 6001),
---        raster_35_01 = raster:load(raster_path..'srtm_35_01.asc', -10, -5, 55, 60, 6001, 6001),
---        raster_36_01 = raster:load(raster_path..'srtm_36_01.asc', -5,  0,  55, 60, 6001, 6001),
---        raster_37_01 = raster:load(raster_path..'srtm_37_01.asc',  0,  5,  55, 60, 6001, 6001)   
---    },
 
     default_mode              = mode.cycling,
     default_speed             = default_speed,
@@ -122,13 +110,6 @@ function setup()
     -- reduce the driving speed by 30% for unsafe roads
     -- only used for cyclability metric
     unsafe_highway_list = {
-      trunk = 0.8,
-      primary = 0.8,
-      secondary = 0.65,
-      tertiary = 0.8,
-      primary_link = 0.8,
-      secondary_link = 0.65,
-      tertiary_link = 0.8,
     },
 
     service_penalties = {
@@ -137,7 +118,7 @@ function setup()
 
     bicycle_speeds = {
       cycleway = default_speed,
-      trunk = default_speed,
+      trunk = default_speed, -- but there shouldn't be any trunks
       primary = default_speed,
       primary_link = default_speed,
       secondary = default_speed,
@@ -200,7 +181,7 @@ function setup()
     },
 
     route_speeds = {
-      ferry = 5
+      --ferry = 5
     },
 
     --bridge_speeds = {
@@ -248,22 +229,6 @@ function setup()
     }, 
 
     highway_turn_classification = {
-      ['trunk'] = 1,
-      ['primary'] = 1,
-      ['trunk_link'] = 2,
-      ['primary_link'] = 2,
-      ['secondary'] = 3,
-      ['secondary_link'] = 3,
-      ['tertiary'] = 4,
-      ['tertiary_link'] = 4,
-      ['unclassified'] = 5,
-      ['cycleway'] = 6, 
-      ['track'] = 7,
-      ['residential'] = 8, -- turning off <= 7 to >= 8 incurs penalty
-      ['living_street'] = 10,
-      ['footway'] = 11,
-      ['path'] = 12,
-      ['pedestrian'] = 13,
     },
 
     access_turn_classification = {}
@@ -361,28 +326,28 @@ function handle_bicycle_tags(profile,way,result,data)
   data.foot_backward = way:get_value_by_key("foot:backward")
   data.bicycle = way:get_value_by_key("bicycle")
 
- --debug_way(way,result,data,"A") 
+ --debug-way(way,result,data,"A") 
 
   speed_handler(profile,way,result,data)
 
---debug_way(way,result,data,"B")
+  --debug-way(way,result,data,"B")
 
   oneway_handler(profile,way,result,data)
 
---debug_way(way,result,data,"C")
+  --debug-way(way,result,data,"C")
 
   cycleway_handler(profile,way,result,data)
 
---debug_way(way,result,data,"D")
+  --debug-way(way,result,data,"D")
 
   safety_handler(profile,way,result,data)
 
---debug_way(way,result,data,"E")
+  --debug-way(way,result,data,"E")
 
   -- maxspeed
   limit( result, data.maxspeed, data.maxspeed_forward, data.maxspeed_backward )
 
---debug_way(way,result,data,"F")
+  --debug-way(way,result,data,"F")
 
   -- not routable if no speed assigned
   -- this avoid assertions in debug builds
@@ -393,14 +358,14 @@ function handle_bicycle_tags(profile,way,result,data)
     result.backward_mode = mode.inaccessible
   end
 
-  --debug_way(way,result,data,"7")
+  --debug-way(way,result,data,"G")
 end
 
 function debug_way(way, result, data, msg)
   local id = way:id()
-  if id == 22741660 then
-    local access = data.access or '(nil)'
-    io.write(tostring(id)..": "..msg..", forward_speed = "..result.forward_speed..", backward_speed = "..result.backward_speed..", access = "..access..", duration="..tostring(result.duration)..", weight = "..tostring(result.weight).."\n")
+  if id == 316886591 or id == 89349043 then
+--    local access = data.access or '(nil)'
+    io.write(tostring(id)..": "..msg..", forward_rate = "..tostring(result.forward_rate)..", forward_speed = "..tostring(result.forward_speed).."\n")
   end 
 end
 
@@ -545,22 +510,62 @@ function safety_handler(profile,way,result,data)
     return false
   end
 
-
   -- convert duration into cyclability
   if profile.properties.weight_name == 'cyclability' then
+    local safety_penalty = profile.unsafe_highway_list[data.highway] or 1.
+    local is_unsafe = safety_penalty < 1
+
+    -- primaries that are one ways are probably huge primaries where the lanes need to be separated
+    if is_unsafe and data.highway == 'primary' and not data.is_twoway then
+      safety_penalty = safety_penalty * 0.5
+    end
+    if is_unsafe and data.highway == 'secondary' and not data.is_twoway then
+      safety_penalty = safety_penalty * 0.6
+    end
+
+    local forward_is_unsafe = is_unsafe and not data.has_cycleway_forward
+    local backward_is_unsafe = is_unsafe and not data.has_cycleway_backward
+    local is_undesireable = data.highway == "service" and profile.service_penalties[data.service]
+    local forward_penalty = 1.
+    local backward_penalty = 1.
+    if forward_is_unsafe then
+--      forward_penalty = math.min(forward_penalty, safety_penalty)
+    end
+    if backward_is_unsafe then
+--       backward_penalty = math.min(backward_penalty, safety_penalty)
+    end
+
+    if is_undesireable then
+       forward_penalty = math.min(forward_penalty, profile.service_penalties[data.service])
+       backward_penalty = math.min(backward_penalty, profile.service_penalties[data.service])
+    end
 
     if result.forward_speed > 0 then
       -- convert from km/h to m/s
-      result.forward_rate = result.forward_speed / 3.6
+      result.forward_rate = result.forward_speed / 3.6 * forward_penalty
     end
     if result.backward_speed > 0 then
       -- convert from km/h to m/s
-      result.backward_rate = result.backward_speed / 3.6 
+      result.backward_rate = result.backward_speed / 3.6 * backward_penalty
     end
     if result.duration > 0 then
-      result.weight = result.duration
+      result.weight = result.duration / forward_penalty
     end
 
+    if data.highway == "bicycle" then
+      safety_bonus = safety_bonus + 0.2
+      if result.forward_speed > 0 then
+        -- convert from km/h to m/s
+        result.forward_rate = result.forward_speed / 3.6 * safety_bonus
+      end
+      if result.backward_speed > 0 then
+        -- convert from km/h to m/s
+        result.backward_rate = result.backward_speed / 3.6 * safety_bonus
+      end
+      if result.duration > 0 then
+        result.weight = result.duration / safety_bonus
+      end
+    end
   end
 end
 
@@ -634,6 +639,7 @@ function process_way(profile, way, result)
     -- compute speed taking into account way type, maxspeed tags, etc.
     WayHandlers.surface,
 
+
     -- new handler to reject anything that isn't a surface we like, including unknown surfaces.
     unknown_surface_handler,
 
@@ -642,6 +648,8 @@ function process_way(profile, way, result)
 
     -- handle turn lanes and road classification, used for guidance
     WayHandlers.classification,
+
+    custom_way_classification,
 
     -- handle allowed start/end modes
     WayHandlers.startpoint,
@@ -664,31 +672,49 @@ function process_way(profile, way, result)
 
   WayHandlers.run(profile, way, result, data, handlers)
 
-debug_way(way,result,data,"END")
+	--debug_way(way,result,data,"END")
 --if result.forward_mode == mode.inaccessible or result.backward_mode == mode.inaccessible then
 --  io.write(tostring(way:id()).." is inaccessible!\n!")
 --end
 
 end
 
-function unknown_surface_handler(profile,way,result,data)
-  local id = way:id()
-  if not (SurfaceWhitelist.whitelist_ways_by_id[id] == true) then
-    if not profile.is_road[data.highway] then
-      local surface = way:get_value_by_key("surface")
+function custom_way_classification(profile, way, result, data)
+  if data.oneway then
+    result.road_classification.num_lanes = result.road_classification.num_lanes * 2
 
+    -- this is to all prevention of turning off a 4 lane road without traffic lights (e.g. A90, see example elsewhere)
+    -- to also apply to a road that is drawn as each carriageway being its own way - each with 2 laens and oneway.
+  end
+
+end
+
+function unknown_surface_handler(profile,way,result,data)
+	--debug-way(way,result,data,"ush_begin")
+  local id = way:id()
+  local surface = way:get_value_by_key("surface")
+  local ncn_ref = way:get_value_by_key("ncn_ref")
+
+  if (SurfaceWhitelist.whitelist_ways_by_id[id] == true) then
+    result.forward_speed = profile.default_speed
+    result.backward_speed = profile.default_speed
+    --debug-way(way,result,data,"whitelist")
+  else
+    if not profile.is_road[data.highway] then
       if surface == nil or (profile.surface_speeds[surface] == nil or profile.surface_speeds[surface] == 0) then
         result.forward_rate = 0
         result.backward_rate = 0
         return false
       end
     end
+    --debug-way(way,result,data,"ush_else")
   end
-
+	--debug-way(way,result,data,"ush_end")
 end
 
 
 function process_turn(profile, turn)
+
 
   -- compute turn penalty as angle^2, with a left/right bias
   local normalized_angle = turn.angle / 90.0
@@ -712,18 +738,6 @@ function process_turn(profile, turn)
     turn.weight = turn.weight + profile.properties.mode_change_penalty
   end
   
-
-  if turn.source_highway_turn_classification > 0  and turn.target_highway_turn_classification > 0 then
-    if turn.source_highway_turn_classification <= 7 and turn.target_highway_turn_classification >= 8 then --turning onto a worse road, e.g. residential
-      turn.weight = turn.weight + profile.properties.highway_change_penalty
-    end
-
-    if turn.source_highway_turn_classification > 1 and turn.target_highway_turn_classification == 1 then
-      turn.weight = turn.weight + profile.properties.onto_primary_penalty --if we're turning onto a primary/trunk from a non-primary/trunk,incur a penalty.
-                -- this is to avoid the coming off a main road temporarily and then back onto it again phenomenon.
-    end
-  end
-
   if turn.source_number_of_lanes > 2 and turn.angle > 30 and not turn.has_traffic_light then
     -- e.g. 55.966113,-3.318558 (A90 in Edinburgh)
     turn.weight = turn.weight + 2000
@@ -734,119 +748,9 @@ function process_turn(profile, turn)
 
 end
 
-function get_raster_source(profile,pos)
-  if pos.lon >= -10 and pos.lon <= -5 and pos.lat >= 45 and pos.lat <= 50 then
-    return profile.raster_sources.raster_35_03
-
-  elseif pos.lon >= -5 and pos.lon <= 0 and pos.lat >= 45 and pos.lat <= 50 then
-    return profile.raster_sources.raster_36_03
-
-  elseif pos.lon >= -15 and pos.lon <= -10 and pos.lat >= 50 and pos.lat <= 55 then
-    return profile.raster_sources.raster_34_02
-
-  elseif pos.lon >= -10 and pos.lon <= -5 and pos.lat >= 50 and pos.lat <= 55 then
-    return profile.raster_sources.raster_35_02
-
-  elseif pos.lon >= -5 and pos.lon <= 0 and pos.lat >= 50 and pos.lat <= 55 then
-    return profile.raster_sources.raster_36_02
-  
-  elseif pos.lon >= 0 and pos.lon <= 5 and pos.lat >= 50 and pos.lat <= 55 then
-    return profile.raster_sources.raster_37_02
-  
-  elseif pos.lon >= -15 and pos.lon <= -10 and pos.lat >= 55 then
-    return profile.raster_sources.raster_34_01
-  
-  elseif pos.lon >= -10 and pos.lon <= -5 and pos.lat >= 55 then
-    return profile.raster_sources.raster_35_01
-  
-  elseif pos.lon >= -5 and pos.lon <= 0 and pos.lat >= 55  then
-    return profile.raster_sources.raster_36_01
-  
-  elseif pos.lon >= 0 and pos.lon <= 5 and pos.lat >= 55 and pos.lat <= 60 then
-    return profile.raster_sources.raster_37_01
-
-  else
-    io.write("no raster source for "..pos.lat..","..pos.lon.."\n")    
-    return nil
-  end
-
-end
-
-maxaversion = nil
-minaversion = nil
-
-function get_hill_aversion(slope, elevationgain)
-  local min_grad_for_aversion = 0.0
---  local max_grad = 0.35
-
---  if slope > max_grad then
---    slope = max_grad
---  end
-
-  if slope < min_grad_for_aversion then
-    slope = min_grad_for_aversion
-  end
-
-  local aversion = math.abs(1.0 / (1.0 - (slope * 5.0)))
-
-  if slope < 0.1 and elevationgain < 0 then
-    aversion = 0.8 --slight benefit for gentle downhills
-  end
-
-  return aversion
-  --return aversion
-end
-
-function process_segment(profile, segment)
-  local sourceraster = get_raster_source(profile,segment.source)
-  local targetraster = get_raster_source(profile,segment.target)
-  if sourceraster ~= nil and targetraster ~= nil then
-    local sourceData = raster:interpolate(sourceraster, segment.source.lon, segment.source.lat)
-    local targetData = raster:interpolate(targetraster, segment.target.lon, segment.target.lat)
-    local invalid = sourceData.invalid_data()
-    local scaled_weight = segment.weight
-    local scaled_duration = segment.duration
-
-    if sourceData.datum ~= invalid and targetData.datum ~= invalid then
-      local elevationgain = targetData.datum - sourceData.datum
-      --local slope = math.abs(elevationgain) / segment.distance -- avoid steepness whether up or down
-      local slope = (targetData.datum - sourceData.datum) / segment.distance
-
-      local hillaversion = get_hill_aversion(slope, elevationgain)
-      if maxaversion == nil or hillaversion > maxaversion then
-        maxaversion = hillaversion
-        io.write("maxaversion = "..tostring(maxaversion).."\n")
-      end
-
-      if minaversion == nil or hillaversion < minaversion then
-        minaversion = hillaversion
-        io.write("minaversion = "..tostring(minaversion).."\n")
-      end
-
-      if hillaversion == 0 or hillaversion == nil then
-        io.write("aversion is 0 or nil!\n")
-      end
-
-      --if segment.target.lat > 57.124556 then
-      --  hillaversion = hillaversion + 1000
-      --end
-      --io.write("hillaversion = "..tostring(hillaversion).."\n")
-      scaled_weight = scaled_weight * hillaversion
-      scaled_duration = scaled_duration * hillaversion
-
-      --scaled_weight = scaled_weight / (1.0 - (slope * 5.0))
-      --scaled_duration = scaled_duration / (1.0 - (slope * 5.0)) 
-    end
-    segment.weight = scaled_weight
-    segment.duration = scaled_duration
-
-  end
-end
-
 return {
   setup = setup,
   process_way = process_way,
   process_node = process_node,
---  process_turn = process_turn,
---  process_segment = process_segment
+  process_turn = process_turn
 }
