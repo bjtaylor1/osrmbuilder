@@ -707,7 +707,7 @@ function process_way(profile, way, result)
 
   WayHandlers.run(profile, way, result, data, handlers)
 
-debug_way(way,result,data,"END")
+	--debug_way(way,result,data,"END")
 --if result.forward_mode == mode.inaccessible or result.backward_mode == mode.inaccessible then
 --  io.write(tostring(way:id()).." is inaccessible!\n!")
 --end
