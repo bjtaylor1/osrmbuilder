@@ -361,28 +361,28 @@ function handle_bicycle_tags(profile,way,result,data)
   data.foot_backward = way:get_value_by_key("foot:backward")
   data.bicycle = way:get_value_by_key("bicycle")
 
- --debug_way(way,result,data,"A") 
+ debug_way(way,result,data,"A") 
 
   speed_handler(profile,way,result,data)
 
-  --debug_way(way,result,data,"B")
+  debug_way(way,result,data,"B")
 
   oneway_handler(profile,way,result,data)
 
-  --debug_way(way,result,data,"C")
+  debug_way(way,result,data,"C")
 
   cycleway_handler(profile,way,result,data)
 
-  --debug_way(way,result,data,"D")
+  debug_way(way,result,data,"D")
 
   safety_handler(profile,way,result,data)
 
-  --debug_way(way,result,data,"E")
+  debug_way(way,result,data,"E")
 
   -- maxspeed
   limit( result, data.maxspeed, data.maxspeed_forward, data.maxspeed_backward )
 
-  --debug_way(way,result,data,"F")
+  debug_way(way,result,data,"F")
 
   -- not routable if no speed assigned
   -- this avoid assertions in debug builds
@@ -393,14 +393,14 @@ function handle_bicycle_tags(profile,way,result,data)
     result.backward_mode = mode.inaccessible
   end
 
-  --debug_way(way,result,data,"G")
+  debug_way(way,result,data,"G")
 end
 
 function debug_way(way, result, data, msg)
   local id = way:id()
-  if id == 51544055 then
+  if id == 316886591 or id == 89349043 then
 --    local access = data.access or '(nil)'
-    io.write(tostring(id)..": "..msg..", lanes = "..tostring(result.road_classification.num_lanes).."\n")
+    io.write(tostring(id)..": "..msg..", forward_rate = "..tostring(result.forward_rate)..", forward_speed = "..tostring(result.forward_speed).."\n")
   end 
 end
 
@@ -675,6 +675,7 @@ function process_way(profile, way, result)
     -- compute speed taking into account way type, maxspeed tags, etc.
     WayHandlers.surface,
 
+
     -- new handler to reject anything that isn't a surface we like, including unknown surfaces.
     unknown_surface_handler,
 
@@ -725,19 +726,30 @@ function custom_way_classification(profile, way, result, data)
 end
 
 function unknown_surface_handler(profile,way,result,data)
+	debug_way(way,result,data,"ush_begin")
   local id = way:id()
-  if not (SurfaceWhitelist.whitelist_ways_by_id[id] == true) then
-    if not profile.is_road[data.highway] then
-      local surface = way:get_value_by_key("surface")
+  local surface = way:get_value_by_key("surface")
+  local ncn_ref = way:get_value_by_key("ncn_ref")
+  if ncn_ref == "647" and surface ~= "dirt" then
+    result.forward_speed = profile.default_speed
+    result.backward_speed = profile.default_speed
+    debug_way(way,result,data,"ncn647")
 
+  elseif (SurfaceWhitelist.whitelist_ways_by_id[id] == true) then
+    result.forward_speed = profile.default_speed
+    result.backward_speed = profile.default_speed
+    debug_way(way,result,data,"whitelist")
+  else
+    if not profile.is_road[data.highway] then
       if surface == nil or (profile.surface_speeds[surface] == nil or profile.surface_speeds[surface] == 0) then
         result.forward_rate = 0
         result.backward_rate = 0
         return false
       end
     end
+    debug_way(way,result,data,"ush_else")
   end
-
+	debug_way(way,result,data,"ush_end")
 end
 
 function builtup_area_handler(profile, way, result, data)
