@@ -138,7 +138,7 @@ function setup()
     bicycle_speeds = {
       cycleway = default_speed,
       trunk = default_speed * (4.0/5.0), -- but there shouldn't be any trunks
-      primary = default_speed ,
+      primary = default_speed * (4.0/5.0) ,
       primary_link = default_speed,
       secondary = default_speed * (5.0/4.0),
       secondary_link = default_speed,
