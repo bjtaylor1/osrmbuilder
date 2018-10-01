@@ -30,9 +30,9 @@ function setup()
       highway_change_penalty        = 0, --it is not worth turning off a highway onto a residential to avoid one traffic light.
                                                 -- ...but it might be worth it to avoid two or more!
       onto_primary_penalty          = 50, -- test 'off and on again' phenonenon on A9 (Golspie/Brora/Helmsdale/Dunbeath)
-      static_turn_cost_rr              = 400,
-      static_turn_cost_r              = 100,
-      static_turn_cost_l              = 60,
+      static_turn_cost_rr              = 50,
+      static_turn_cost_r              = 20,
+      static_turn_cost_l              = 20,
       force_split_edges = true,
       process_call_tagless_node = false
     },
