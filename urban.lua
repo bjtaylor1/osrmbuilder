@@ -18,8 +18,8 @@ function setup()
 
   return {
     properties = {
-      u_turn_penalty                = 0,
-      traffic_light_penalty         = 0,
+      u_turn_penalty                = 20,
+      traffic_light_penalty         = 10,
       weight_name                   = 'cyclability',
 --      weight_name                   = 'duration',
       process_call_tagless_node     = false,
@@ -30,8 +30,8 @@ function setup()
       highway_change_penalty        = 0, --it is not worth turning off a highway onto a residential to avoid one traffic light.
                                                 -- ...but it might be worth it to avoid two or more!
       onto_primary_penalty          = 50, -- test 'off and on again' phenonenon on A9 (Golspie/Brora/Helmsdale/Dunbeath)
-      static_turn_cost_r              = 0,
-      static_turn_cost_l              = 0,
+      static_turn_cost_r              = 50,
+      static_turn_cost_l              = 30,
       force_split_edges = true,
       process_call_tagless_node = false
     },
@@ -128,8 +128,8 @@ function setup()
     bicycle_speeds = {
       cycleway = default_speed,
       trunk = default_speed, -- but there shouldn't be any trunks
-      primary = default_speed ,
-      primary_link = default_speed,
+      primary = default_speed*5.0/4.0 ,
+      primary_link = default_speed*5.0/4.0,
       secondary = default_speed,
       secondary_link = default_speed,
       tertiary = default_speed,
