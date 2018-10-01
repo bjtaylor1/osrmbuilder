@@ -36,25 +36,23 @@ function setup()
       process_call_tagless_node = false
     },
 
-    raster_sources = {
-        raster_35_03 = raster:load(raster_path..'srtm_35_03.asc', -10, -5, 45, 50, 6001, 6001),
-        raster_36_03 = raster:load(raster_path..'srtm_36_03.asc',  -5,  0, 45, 50, 6001, 6001),
-	raster_34_02 = raster:load(raster_path..'srtm_34_02.asc', -15,-10, 50, 55, 6001, 6001 ),
-        raster_35_02 = raster:load(raster_path..'srtm_35_02.asc', -10, -5, 50, 55, 6001, 6001),
-        raster_36_02 = raster:load(raster_path..'srtm_36_02.asc',  -5,  0, 50, 55, 6001, 6001),
-        raster_37_02 = raster:load(raster_path..'srtm_37_02.asc',   0,  5, 50, 55, 6001, 6001),
-        raster_34_01 = raster:load(raster_path..'srtm_34_01.asc', -15, -10,55, 60, 6001, 6001),
-        raster_35_01 = raster:load(raster_path..'srtm_35_01.asc', -10, -5, 55, 60, 6001, 6001),
-        raster_36_01 = raster:load(raster_path..'srtm_36_01.asc', -5,  0,  55, 60, 6001, 6001),
-        raster_37_01 = raster:load(raster_path..'srtm_37_01.asc',  0,  5,  55, 60, 6001, 6001)   
-    },
+--    raster_sources = {
+--        raster_35_03 = raster:load(raster_path..'srtm_35_03.asc', -10, -5, 45, 50, 6001, 6001),
+--        raster_36_03 = raster:load(raster_path..'srtm_36_03.asc',  -5,  0, 45, 50, 6001, 6001),
+--	raster_34_02 = raster:load(raster_path..'srtm_34_02.asc', -15,-10, 50, 55, 6001, 6001 ),
+--        raster_35_02 = raster:load(raster_path..'srtm_35_02.asc', -10, -5, 50, 55, 6001, 6001),
+--        raster_36_02 = raster:load(raster_path..'srtm_36_02.asc',  -5,  0, 50, 55, 6001, 6001),
+--        raster_37_02 = raster:load(raster_path..'srtm_37_02.asc',   0,  5, 50, 55, 6001, 6001),
+--        raster_34_01 = raster:load(raster_path..'srtm_34_01.asc', -15, -10,55, 60, 6001, 6001),
+--        raster_35_01 = raster:load(raster_path..'srtm_35_01.asc', -10, -5, 55, 60, 6001, 6001),
+--        raster_36_01 = raster:load(raster_path..'srtm_36_01.asc', -5,  0,  55, 60, 6001, 6001),
+--        raster_37_01 = raster:load(raster_path..'srtm_37_01.asc',  0,  5,  55, 60, 6001, 6001)   
+--    },
 
     default_mode              = mode.cycling,
     default_speed             = default_speed,
     walking_speed             = walking_speed,
     oneway_handling           = true,
-    turn_penalty              = 6,
-    turn_bias                 = 1.4,
     use_public_transport      = true,
 
     allowed_start_modes = Set {
@@ -363,7 +361,7 @@ function handle_bicycle_tags(profile,way,result,data)
 
   --debug-way(way,result,data,"C")
 
-  cycleway_handler(profile,way,result,data)
+--  cycleway_handler(profile,way,result,data)
 
   --debug-way(way,result,data,"D")
 
@@ -847,6 +845,7 @@ function get_hill_aversion(slope, elevationgain)
 end
 
 function process_segment(profile, segment)
+
   local sourceraster = get_raster_source(profile,segment.source)
   local targetraster = get_raster_source(profile,segment.target)
   if sourceraster ~= nil and targetraster ~= nil then
@@ -897,5 +896,5 @@ return {
   process_way = process_way,
   process_node = process_node,
   process_turn = process_turn,
-  process_segment = process_segment
+--  process_segment = process_segment
 }
