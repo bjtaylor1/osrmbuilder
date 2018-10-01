@@ -19,7 +19,7 @@ function setup()
   return {
     properties = {
       u_turn_penalty                = 20,
-      traffic_light_penalty         = 10,
+      traffic_light_penalty         = 0,
       weight_name                   = 'cyclability',
 --      weight_name                   = 'duration',
       process_call_tagless_node     = false,
@@ -362,7 +362,7 @@ function handle_bicycle_tags(profile,way,result,data)
 
   --debug-way(way,result,data,"C")
 
---  cycleway_handler(profile,way,result,data)
+  cycleway_handler(profile,way,result,data)
 
   --debug-way(way,result,data,"D")
 
