@@ -30,8 +30,9 @@ function setup()
       highway_change_penalty        = 0, --it is not worth turning off a highway onto a residential to avoid one traffic light.
                                                 -- ...but it might be worth it to avoid two or more!
       onto_primary_penalty          = 50, -- test 'off and on again' phenonenon on A9 (Golspie/Brora/Helmsdale/Dunbeath)
-      static_turn_cost_r              = 50,
-      static_turn_cost_l              = 30,
+      static_turn_cost_rr              = 200,
+      static_turn_cost_r              = 100,
+      static_turn_cost_l              = 60,
       force_split_edges = true,
       process_call_tagless_node = false
     },
@@ -768,15 +769,17 @@ function process_turn(profile, turn)
   if turn.angle > 30 and not turn.has_traffic_light then
     if turn.source_number_of_lanes > 2 then
     -- e.g. 55.966113,-3.318558 (A90 in Edinburgh)
---      turn.weight = turn.weight + 2000
+      turn.weight = turn.weight + 2000
     else
---      turn.weight = turn.weight + 50
+      turn.weight = turn.weight + 50
     end
   end
 
-  if turn.angle > 30 and not turn.source_is_link then
+  if turn.angle > 75 then
+    turn.weight = turn.weight + profile.properties.static_turn_cost_rr
+  elseif turn.angle > 30 then
     turn.weight = turn.weight + profile.properties.static_turn_cost_r
-  elseif turn.angle < -30 and not turn.source_is_link  then
+  elseif turn.angle < -30 then
     turn.weight = turn.weight + profile.properties.static_turn_cost_l
   end
 end
