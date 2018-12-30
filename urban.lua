@@ -37,6 +37,7 @@ function setup()
       force_split_edges = true,
       process_call_tagless_node = false
     },
+    knownbicycletags = {},
 
 --    raster_sources = {
 --        raster_35_03 = raster:load(raster_path..'srtm_35_03.asc', -10, -5, 45, 50, 6001, 6001),
@@ -531,12 +532,13 @@ end
 
 
 function safety_handler(profile,way,result,data)
-  if data.maxspeed > 110 then
+  if data.maxspeed > 110 or data.bicycle == 'unsuitable' then
     data.forward_rate = 0
     data.backward_rate = 0
     return false
   end
-  
+ 
+
   -- convert duration into cyclability
     if result.forward_speed > 0 then
       -- convert from km/h to m/s

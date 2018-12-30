@@ -546,7 +546,7 @@ end
 
 
 function safety_handler(profile,way,result,data)
-  if data.maxspeed > 110 then
+  if data.maxspeed > 110  or data.bicycle == 'unsuitable' then
     data.forward_rate = 0
     data.backward_rate = 0
     return false
