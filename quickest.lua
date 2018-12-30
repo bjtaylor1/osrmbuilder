@@ -211,6 +211,13 @@ function setup()
       asphalt = default_speed,
       ["cobblestone:flattened"] = default_speed,
       paving_stones = default_speed,
+      tarmac = default_speed,
+      paved = default_speed,
+      concrete = defaul_speed,
+      ["concrete:lanes"] = default_speed,
+      ["concrete:plates"] = default_speed,
+      metal = default_speed,
+      wood = default_speed,
       compacted = 0,
       cobblestone = 0,
       unpaved = 0,
@@ -222,8 +229,6 @@ function setup()
       earth = 0,
       grass = 0,
       mud = 0,
-      sand = 0,
-      sett = 0
     },
 
     classes = Sequence {
