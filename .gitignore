@@ -21,5 +21,8 @@ touristb/
 urbannessdata_scotland/
 urbannessdata/
 optimum/
+shortest/
+quickest/
+urban/
 
 *.dump

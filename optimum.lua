@@ -722,7 +722,7 @@ function process_way(profile, way, result)
 end
 
 function custom_way_classification(profile, way, result, data)
-  if data.oneway then
+  if data.oneway ~= nil and (data.oneway == "yes" or data.oneway == "1" or data.oneway == "true") then
     result.road_classification.num_lanes = result.road_classification.num_lanes * 2
 
     -- this is to all prevention of turning off a 4 lane road without traffic lights (e.g. A90, see example elsewhere)
