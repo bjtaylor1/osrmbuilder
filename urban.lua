@@ -142,8 +142,8 @@ function setup()
       living_street = default_speed,
       road = default_speed,
       track = default_speed,
-      path = default_speed
---      service = default_speed
+      path = default_speed,
+      service = default_speed
     },
 
 
