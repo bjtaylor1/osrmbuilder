@@ -148,8 +148,8 @@ function setup()
         tertiary_link   = true,
         unclassified    = true,
         residential     = true,
-        living_street   = true
---        service = true
+        living_street   = true,
+        service = true
     },
 
     pedestrian_speeds = {
