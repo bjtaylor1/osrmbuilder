@@ -4,8 +4,8 @@ set -x
 createuser --no-superuser --no-createrole --createdb osm
 createdb -E UTF8 -O osm osm
 createlang plpgsql osm
-psql -d osm -f /usr/share/postgresql/9.5/contrib/postgis-2.2/postgis.sql 				# <- CHANGE THIS PATH
-psql -d osm -f /usr/share/postgresql/9.5/contrib/postgis-2.2/spatial_ref_sys.sql 			# <- CHANGE THIS PATH
+psql -d osm -f /usr/share/postgresql/10/contrib/postgis-2.4/postgis.sql 				# <- CHANGE THIS PATH
+psql -d osm -f /usr/share/postgresql/10/contrib/postgis-2.4/spatial_ref_sys.sql 			# <- CHANGE THIS PATH
 psql -d osm -f /usr/local/lib/python2.7/dist-packages/imposm/900913.sql
 echo "ALTER TABLE geometry_columns OWNER TO osm;" | psql -d osm
 echo "ALTER TABLE spatial_ref_sys OWNER TO osm;" | psql -d osm
