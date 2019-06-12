@@ -1,5 +1,5 @@
-location /routeauk {
-                rewrite ^/routeauk/(.*)$ /route/$1 break;
+location /routeshortest {
+                rewrite ^/routeshortest/(.*)$ /route/$1 break;
                 proxy_pass  http://127.0.0.1:5001;
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
@@ -7,8 +7,8 @@ location /routeauk {
 #                add_header Access-Control-Allow-Origin *;
         }
 
-location /routetourist {
-                rewrite ^/routetourist/(.*)$ /route/$1 break;
+location /routeoptimum {
+                rewrite ^/routeoptimum/(.*)$ /route/$1 break;
                 proxy_pass  http://127.0.0.1:5002;
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
