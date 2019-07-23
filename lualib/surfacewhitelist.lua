@@ -129,6 +129,32 @@ whitelist_ways_by_id = {
 [300857808] = true,
 [541689757] = true,
 [300857796] = true,
-[300857806] = true
-
+[300857806] = true,
+-- high peak trail:
+[39656760] = true,
+[39656760] = true,
+[39657498] = true,
+[42031783] = true,
+[39657499] = true,
+[39656761] = true,
+[72925644] = true,
+[39657499] = true,
+[39656761] = true,
+[72925644] = true,
+[39656762] = true,
+[108531800] = true,
+[107200247] = true,
+[107200245] = true,
+[39609816] = true,
+--tissington trail
+[496428473] = true,
+--manifold trail:
+[213567399] = true,
+[44927250] = true,
+--monsal trail:
+[230959301] = true,
+[25825322] = true,
+[41546579] = true,
+[126404853] = true,
+[28284766] = true
 }

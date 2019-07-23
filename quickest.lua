@@ -343,8 +343,10 @@ function handle_bicycle_tags(profile,way,result,data)
   end
 
   -- access
+  local id = way:id()
+
   data.access = find_access_tag(way, profile.access_tags_hierarchy)
-  if data.access and profile.access_tag_blacklist[data.access] then
+  if data.access and profile.access_tag_blacklist[data.access] and (not (SurfaceWhitelist.whitelist_ways_by_id[id] == true)) then
     return false
   end
 
@@ -734,7 +736,17 @@ function unknown_surface_handler(profile,way,result,data)
   local id = way:id()
   local surface = way:get_value_by_key("surface")
   local ncn_ref = way:get_value_by_key("ncn_ref")
-  if ncn_ref == "647" and surface ~= "dirt" then
+  local name = way:get_value_by_key("name")
+  
+  if name == "High Peak Trail" or
+    name == "Tissington Trail" or 
+    name == "Manifold Track" or
+    name = "Monsal Trail" then
+    
+    result.forward_speed = profile.default_speed
+    result.backward_speed = profile.default_speed
+    
+  elseif ncn_ref == "647" and surface ~= "dirt" then
     result.forward_speed = profile.default_speed
     result.backward_speed = profile.default_speed
     --debug-way(way,result,data,"ncn647")
