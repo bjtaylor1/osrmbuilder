@@ -743,7 +743,7 @@ function unknown_surface_handler(profile,way,result,data)
   if name == "High Peak Trail" or
     name == "Tissington Trail" or 
     name == "Manifold Track" or
-    name = "Monsal Trail" then
+    name == "Monsal Trail" then
     
     result.forward_speed = profile.default_speed
     result.backward_speed = profile.default_speed
