@@ -146,11 +146,14 @@ whitelist_ways_by_id = {
 [107200247] = true,
 [107200245] = true,
 [39609816] = true,
+[30199351] = true,
 --tissington trail
 [496428473] = true,
 --manifold trail:
 [213567399] = true,
 [44927250] = true,
+[44927256] = true,
+[50389682] = true, --sparrowlee bridge
 --monsal trail:
 [230959301] = true,
 [25825322] = true,
