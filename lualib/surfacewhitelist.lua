@@ -138,15 +138,13 @@ whitelist_ways_by_id = {
 [39657499] = true,
 [39656761] = true,
 [72925644] = true,
-[39657499] = true,
-[39656761] = true,
-[72925644] = true,
 [39656762] = true,
 [108531800] = true,
 [107200247] = true,
 [107200245] = true,
 [39609816] = true,
 [30199351] = true,
+[30199350] = true,
 --tissington trail
 [496428473] = true,
 --manifold trail:
