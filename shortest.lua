@@ -679,7 +679,18 @@ function process_way(profile, way, result)
     WayHandlers.way_classification_for_turn
   }
 
-  WayHandlers.run(profile, way, result, data, handlers)
+  local id=way:id()
+  if(SurfaceWhitelist.whitelist_ways_by_id[id]==true) then
+	  --if it's whitelisted, that trumps everything else
+    result.forward_speed = profile.default_speed
+    result.backward_speed = profile.default_speed
+    result.forward_rate = profile.default_speed / 3.6
+    result.backward_rate = profile.default_speed / 3.6
+    result.forward_mode = mode.cycling
+    result.backward_mode = mode.cycling
+  else
+    WayHandlers.run(profile, way, result, data, handlers)
+  end
 
 	--debug_way(way,result,data,"END")
 --if result.forward_mode == mode.inaccessible or result.backward_mode == mode.inaccessible then
