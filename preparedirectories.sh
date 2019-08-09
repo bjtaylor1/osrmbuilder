@@ -15,5 +15,8 @@ for routetype in shortest optimum quickest urban; do
   ./osrm-extract countries.osm.pbf -p $routetype.lua
   ./osrm-contract countries.osrm  
   cd ..
+  
+  
 done
 
+echo PrepareDirectoriesFinished
