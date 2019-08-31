@@ -28,8 +28,13 @@ function process_way(profile, way, result)
 
 end
 
+function process_node(profile, node, result)
+  result.barrier = false
+end
+
 
 return {
   setup = setup,
-  process_way = process_way
+  process_way = process_way,
+  process_node = process_node
 }
