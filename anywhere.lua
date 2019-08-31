@@ -5,6 +5,19 @@ api_version = 4
 
 local default_speed = 15
 
+function setup()
+
+  local default_speed = 15
+  local walking_speed = 4
+
+  return {
+    default_speed = default_speed,
+    properties = {
+      
+    },
+  }
+end
+
 function process_way(profile, way, result)
     result.forward_speed = profile.default_speed
     result.backward_speed = profile.default_speed
@@ -17,5 +30,6 @@ end
 
 
 return {
+  setup = setup,
   process_way = process_way
 }
