@@ -1,0 +1,39 @@
+From 36989a3eb71512b0dc0bd6eae8b3f24d6651147e Mon Sep 17 00:00:00 2001
+From: Ubuntu <ubuntu@ip-172-31-17-231.eu-west-1.compute.internal>
+Date: Mon, 2 Sep 2019 14:28:01 +0000
+Subject: [PATCH] fix block size
+
+---
+ include/util/indexed_data.hpp | 1 +
+ include/util/range_table.hpp  | 3 +++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/include/util/indexed_data.hpp b/include/util/indexed_data.hpp
+index 080311040..996b5ea4e 100644
+--- a/include/util/indexed_data.hpp
++++ b/include/util/indexed_data.hpp
+@@ -15,6 +15,7 @@
+ #include <limits>
+ #include <string>
+ #include <type_traits>
++#undef BLOCK_SIZE
+ 
+ namespace osrm
+ {
+diff --git a/include/util/range_table.hpp b/include/util/range_table.hpp
+index fcb732b24..e74e2980a 100644
+--- a/include/util/range_table.hpp
++++ b/include/util/range_table.hpp
+@@ -10,6 +10,9 @@
+ #include <fstream>
+ #include <utility>
+ 
++#undef BLOCK_SIZE
++
++
+ namespace osrm
+ {
+ namespace util
+-- 
+2.17.1
+
